@@ -17,7 +17,7 @@
     "prepare": "dts build",
     "size": "size-limit",
     "start": "dts watch",
-    "test": "dts test --passWithNoTests"
+    "test": "dts test --passWithNoTests --watch"
   },
   "husky": {
     "hooks": {
@@ -48,5 +48,20 @@
       "path": "dist/signals-for-react.esm.js",
       "limit": "10 KB"
     }
-  ]
+  ],
+  "devDependencies": {
+    "@size-limit/preset-small-lib": "^8.2.4",
+    "@testing-library/react": "^14.0.0",
+    "@tsconfig/recommended": "^1.0.2",
+    "@tsconfig/vite-react": "^2.0.0",
+    "@types/react": "^18.2.6",
+    "@types/react-dom": "^18.2.4",
+    "dts-cli": "^2.0.3",
+    "husky": "^8.0.3",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "size-limit": "^8.2.4",
+    "tslib": "^2.5.2",
+    "typescript": "^5.0.4"
+  }
 }

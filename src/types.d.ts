@@ -1,0 +1,1 @@
+export type MessageFunction<T>  = (nextValue: T, messageId: number) => void
