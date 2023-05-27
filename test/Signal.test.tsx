@@ -1,5 +1,4 @@
-import { Signal } from '../src/index'
-import { onValueUpdateFromSubscriberSymbol,  handleSubscribeSymbol } from '../src/Signal'
+import { Signal, onValueUpdateFromSubscriberSymbol,  handleSubscribeSymbol } from '../src/Signal'
 
 describe('Signal, local', () => {
   it('returns the value when accessed through signal.value and signal.snapshot', () => {
@@ -41,7 +40,7 @@ describe('Signal, local', () => {
 
     expect(signal.value).toBe(0)
 
-    signal.clearValueRequests()
+    signal.unsubscribeFromSelf()
     signal.value = 1
 
     expect(signal.snapshot).toBe(1)

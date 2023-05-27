@@ -10,11 +10,11 @@ export class Signal<T> {
 
     constructor(
         initialValue: T,
-        onGetValue: () => void,
+        selfSubscription: () => void,
         notifyParent?: MessageFunction<T>
     ) {
         this.#value = initialValue
-        this.#onGetValue = onGetValue
+        this.#selfSubscription = selfSubscription
 
         if (notifyParent) this.#notifyParent = notifyParent
 
@@ -34,8 +34,8 @@ export class Signal<T> {
     }
 
     #value: T
-    #isValueRequested: boolean = false
-    #onGetValue: () => void
+    #isSubscribedToSelf: boolean = false
+    #selfSubscription: () => void
     #notifyParent?:  MessageFunction<T>
     #subscribers: Set<MessageFunction<T>> = new Set([])
     #currentMessageId: number = -1
@@ -51,9 +51,9 @@ export class Signal<T> {
 
         if (!isFromParent) this.#notifyParent?.(nextValue, messageId)
         if(this.#subscribers.size > 0) this.#publish()
-        if (this.#isValueRequested) {
-            this.clearValueRequests()
-            this.#onGetValue()
+        if (this.#isSubscribedToSelf) {
+            this.unsubscribeFromSelf()
+            this.#selfSubscription()
         }
 
     }
@@ -61,8 +61,8 @@ export class Signal<T> {
     public [onValueUpdateFromSubscriberSymbol]: MessageFunction<T>
     public [handleSubscribeSymbol]: MessageFunction<T>
 
-    public clearValueRequests = () => {
-        this.#isValueRequested = false
+    public unsubscribeFromSelf = () => {
+        this.#isSubscribedToSelf = false
     }
 
     public subscribe = (cb: MessageFunction<T>): (() => void) => {
@@ -81,7 +81,7 @@ export class Signal<T> {
     }
 
     public get value() {
-        this.#isValueRequested = true
+        this.#isSubscribedToSelf = true
         return this.#value
     }
 
