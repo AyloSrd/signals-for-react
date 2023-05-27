@@ -1,7 +1,6 @@
-import { Signal, useSignal, usePropSignal } from '../../../src'
-import * as React from 'react'
+import { Signal, useSignal, usePropSignal } from '../../../src';
+import * as React from 'react';
 
 interface Props {
-  signal: Signal<number>,
-  
+  signal: Signal<number>;
 }

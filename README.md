@@ -26,7 +26,7 @@ npm i # or yarn to install dependencies
 npm start # or yarn start
 ```
 
-The default example imports and live reloads whatever is in `/dist`, so if you are seeing an out of date component, make sure DTS is running in watch mode like we recommend above. 
+The default example imports and live reloads whatever is in `/dist`, so if you are seeing an out of date component, make sure DTS is running in watch mode like we recommend above.
 
 To do a one-off build, use `npm run build` or `yarn build`.
 

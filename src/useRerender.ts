@@ -1,7 +1,9 @@
-import * as React from 'react'
+import * as React from 'react';
 
-export function useRerender(){
-    const [, setState] = React.useState(0)
-    
-    return React.useCallback(() => { setState(s => s + 1) }, [])
+export function useRerender() {
+  const [, setState] = React.useState(0);
+
+  return React.useCallback(() => {
+    setState((s) => s + 1);
+  }, []);
 }

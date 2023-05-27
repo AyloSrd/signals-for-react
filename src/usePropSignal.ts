@@ -1,22 +1,29 @@
-import { Signal, onValueUpdateFromSubscriberSymbol, handleSubscribeSymbol } from './Signal'
-import { useRerender } from './useRerender'
-import * as React from 'react'
+import {
+  Signal,
+  onValueUpdateFromSubscriberSymbol,
+  handleSubscribeSymbol,
+  createSignal,
+} from './Signal';
+import { useRerender } from './useRerender';
+import * as React from 'react';
 
-export function usePropSignal<T>(propsSignal: Signal<T>){
-    const rerender = useRerender()
-    const signal = React.useRef(new  Signal<T>(
-        propsSignal.snapshot,
-        rerender,
-        propsSignal[onValueUpdateFromSubscriberSymbol]
-    )).current
+export function usePropSignal<T>(propsSignal: Signal<T>) {
+  const rerender = useRerender();
+  const signal = React.useRef(
+    createSignal(
+      propsSignal.snapshot,
+      rerender,
+      propsSignal[onValueUpdateFromSubscriberSymbol]
+    )
+  ).current;
 
-    signal.unsubscribeFromSelf()
+  signal.unsubscribeFromSelf();
 
-    const unsubscribe = React.useRef(propsSignal.subscribe(
-        signal[handleSubscribeSymbol]
-    )).current
+  const unsubscribe = React.useRef(
+    propsSignal.subscribe(signal[handleSubscribeSymbol])
+  ).current;
 
-    React.useEffect(() => unsubscribe())
+  React.useEffect(() => unsubscribe());
 
-    return signal
+  return signal;
 }
