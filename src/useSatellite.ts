@@ -7,7 +7,7 @@ import {
 import { useRerender } from './useRerender';
 import * as React from 'react';
 
-export function usePropSignal<T>(propsSignal: Signal<T>) {
+export function useSatellite<T>(propsSignal: Signal<T>) {
   const rerender = useRerender();
   const signal = React.useRef(
     createSignal(
