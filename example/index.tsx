@@ -11,10 +11,10 @@ const Inner = ({ countSignal }: { countSignal: Signal<number> }) => {
       <button onClick={() => setShow((s) => !s)}>
         {show ? 'hide' : 'show'}
       </button>
-      <button onClick={() => (count.value = count.snapshot + 1)}>
+      <button onClick={() => (count.set(prevCount => prevCount + 1))}>
         increment
       </button>
-      <button onClick={() => console.log(count.snapshot)}>snapshot</button>
+      <button onClick={() => console.log(count.peep)}>snapshot</button>
       {show && <p>count: {count.value}</p>}
     </>
   );
@@ -30,10 +30,10 @@ const App = () => {
       <button onClick={() => setShow((s) => !s)}>
         {show ? 'hide' : 'show'}
       </button>
-      <button onClick={() => (count.value = count.snapshot + 1)}>
+      <button onClick={() => (count.set(prevCount => prevCount + 1))}>
         increment
       </button>
-      <button onClick={() => console.log(count.snapshot)}>snapshot</button>
+      <button onClick={() => console.log(count.peep)}>snapshot</button>
       {show && <p>count: {count.value}</p>}
       Inner
       <Inner countSignal={count} />

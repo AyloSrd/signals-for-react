@@ -11,18 +11,18 @@ import {
 } from './utils/components/useSatelliteWrappers';
 import {
   outerRerenders,
-  outerSnapshot,
+  outerPeep,
   middleRerenders,
-  middleSnapshot,
+  middlePeep,
   innerRerenders,
-  innerSnapshot,
+  innerPeep,
   setVariablesToZero,
   handleInnerRerender,
-  handleInnerSnapshot,
+  handleInnerPeep,
   handleMiddleRerender,
-  handleMiddleSnapshot,
+  handleMiddlePeep,
   handleOuterRerender,
-  handleOuterSnapshot,
+  handleOuterPeep,
 } from './utils/helpers/useSatelliteHelpers';
 import * as React from 'react';
 
@@ -55,11 +55,11 @@ describe('useSatellite, basic use cases', () => {
       const { getByText } = render(
         <OuterWithInner
           onInnerRerender={handleInnerRerender}
-          onInnerSnapshot={handleInnerSnapshot}
+          onInnerPeep={handleInnerPeep}
           onMiddleRerender={handleMiddleRerender}
-          onMiddleSnapshot={handleMiddleSnapshot}
+          onMiddlePeep={handleMiddlePeep}
           onRerender={handleOuterRerender}
-          onSnapshot={handleOuterSnapshot}
+          onPeep={handleOuterPeep}
         />
       );
       fireEvent.click(getByText('hide outer'));
@@ -79,7 +79,7 @@ describe('useSatellite, basic use cases', () => {
       expect(outerRerenders).toBe(2);
 
       fireEvent.click(getByText('outer snapshot'));
-      expect(outerSnapshot).toBe(3);
+      expect(outerPeep).toBe(3);
 
       fireEvent.click(getByText('show outer'));
       expect(getByText('outer count: 3')).toBeTruthy();
@@ -92,11 +92,11 @@ describe('useSatellite, basic use cases', () => {
       const { getByText } = render(
         <OuterWithMemoizedInner
           onInnerRerender={handleInnerRerender}
-          onInnerSnapshot={handleInnerSnapshot}
+          onInnerPeep={handleInnerPeep}
           onMiddleRerender={handleMiddleRerender}
-          onMiddleSnapshot={handleMiddleSnapshot}
+          onMiddlePeep={handleMiddlePeep}
           onRerender={handleOuterRerender}
-          onSnapshot={handleOuterSnapshot}
+          onPeep={handleOuterPeep}
         />
       );
 
@@ -113,7 +113,7 @@ describe('useSatellite, basic use cases', () => {
       expect(innerRerenders).toBe(2);
 
       fireEvent.click(getByText('inner snapshot'));
-      expect(innerSnapshot).toBe(3);
+      expect(innerPeep).toBe(3);
 
       fireEvent.click(getByText('show inner'));
       expect(getByText('outer count: 3')).toBeTruthy();
@@ -128,11 +128,11 @@ describe('useSatellite, advanced use cases', () => {
       const { getByText } = render(
         <OuterWithMiddlePassingSatellite
           onInnerRerender={handleInnerRerender}
-          onInnerSnapshot={handleInnerSnapshot}
+          onInnerPeep={handleInnerPeep}
           onMiddleRerender={handleMiddleRerender}
-          onMiddleSnapshot={handleMiddleSnapshot}
+          onMiddlePeep={handleMiddlePeep}
           onRerender={handleOuterRerender}
-          onSnapshot={handleOuterSnapshot}
+          onPeep={handleOuterPeep}
         />
       );
       fireEvent.click(getByText('increment inner'));
@@ -157,11 +157,11 @@ describe('useSatellite, advanced use cases', () => {
       const { getByText } = render(
         <OuterWithMiddlePassingSignal
           onInnerRerender={handleInnerRerender}
-          onInnerSnapshot={handleInnerSnapshot}
+          onInnerPeep={handleInnerPeep}
           onMiddleRerender={handleMiddleRerender}
-          onMiddleSnapshot={handleMiddleSnapshot}
+          onMiddlePeep={handleMiddlePeep}
           onRerender={handleOuterRerender}
-          onSnapshot={handleOuterSnapshot}
+          onPeep={handleOuterPeep}
         />
       );
       fireEvent.click(getByText('increment inner'));
@@ -186,11 +186,11 @@ describe('useSatellite, advanced use cases', () => {
       const { getByText } = render(
         <OuterWithMiddlePassingSatellite
           onInnerRerender={handleInnerRerender}
-          onInnerSnapshot={handleInnerSnapshot}
+          onInnerPeep={handleInnerPeep}
           onMiddleRerender={handleMiddleRerender}
-          onMiddleSnapshot={handleMiddleSnapshot}
+          onMiddlePeep={handleMiddlePeep}
           onRerender={handleOuterRerender}
-          onSnapshot={handleOuterSnapshot}
+          onPeep={handleOuterPeep}
         />
       );
       fireEvent.click(getByText('hide outer'));
@@ -206,8 +206,8 @@ describe('useSatellite, advanced use cases', () => {
 
       fireEvent.click(getByText('outer snapshot'));
       fireEvent.click(getByText('middle snapshot'));
-      expect(outerSnapshot).toBe(3);
-      expect(middleSnapshot).toBe(3);
+      expect(outerPeep).toBe(3);
+      expect(middlePeep).toBe(3);
 
       fireEvent.click(getByText('show outer'));
       fireEvent.click(getByText('show middle'));
@@ -222,11 +222,11 @@ describe('useSatellite, advanced use cases', () => {
       const { getByText } = render(
         <OuterWithMiddlePassingSatellite
           onInnerRerender={handleInnerRerender}
-          onInnerSnapshot={handleInnerSnapshot}
+          onInnerPeep={handleInnerPeep}
           onMiddleRerender={handleMiddleRerender}
-          onMiddleSnapshot={handleMiddleSnapshot}
+          onMiddlePeep={handleMiddlePeep}
           onRerender={handleOuterRerender}
-          onSnapshot={handleOuterSnapshot}
+          onPeep={handleOuterPeep}
         />
       );
       fireEvent.click(getByText('increment inner'));

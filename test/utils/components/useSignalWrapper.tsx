@@ -2,14 +2,14 @@ import { useSignal } from '../../../src';
 import * as React from 'react';
 
 interface Props {
-  onSnapshot?: (snapshot: number) => void;
+  onPeep?: (snapshot: number) => void;
   onRerender?: () => void;
   children?: React.ReactNode;
 }
 
 export const SimpleUseSignalWrapper: React.FC<Props> = ({
   children,
-  onSnapshot,
+  onPeep,
   onRerender,
 }: Props) => {
   const count = useSignal(0);
@@ -22,11 +22,11 @@ export const SimpleUseSignalWrapper: React.FC<Props> = ({
       <button onClick={() => setShow((s) => !s)}>
         {show ? 'hide' : 'show'}
       </button>
-      <button onClick={() => (count.value = count.snapshot + 1)}>
+      <button onClick={() => (count.set(prevCount => prevCount + 1))}>
         increment
       </button>
-      {onSnapshot && (
-        <button onClick={() => onSnapshot(count.snapshot)}>snapshot</button>
+      {onPeep && (
+        <button onClick={() => onPeep(count.peep)}>snapshot</button>
       )}
       {show && <p>count: {count.value}</p>}
       <br />

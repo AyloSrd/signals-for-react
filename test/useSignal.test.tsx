@@ -27,14 +27,14 @@ describe('Hooks, useSignal, testing alone', () => {
       renders++;
     }
 
-    function handleSnapshot(snap: number) {
+    function handlePeep(snap: number) {
       snapshot = snap;
     }
 
     const { getByText } = render(
       <SimpleUseSignalWrapper
         onRerender={handleRerender}
-        onSnapshot={handleSnapshot}
+        onPeep={handlePeep}
       />
     );
     expect(getByText('count: 0')).toBeTruthy();

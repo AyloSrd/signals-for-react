@@ -11,7 +11,7 @@ export function useSatellite<T>(propsSignal: Signal<T>) {
   const rerender = useRerender();
   const signal = React.useRef(
     createSignal(
-      propsSignal.snapshot,
+      propsSignal.peep,
       rerender,
       propsSignal[onValueUpdateFromSubscriberSymbol]
     )

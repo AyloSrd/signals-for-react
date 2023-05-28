@@ -76,7 +76,7 @@ export class Signal<T> {
     this.#subscribers.delete(cb);
   };
 
-  public get snapshot() {
+  public get peep() {
     return this.#value;
   }
 
@@ -85,10 +85,12 @@ export class Signal<T> {
     return this.#value;
   }
 
-  public set value(nextValue: T) {
+  public set = (nextValue: T | ((prevValue: T) => T)) => {
+    const _nextValue =
+      nextValue instanceof Function ? nextValue(this.#value) : nextValue;
     const nextMessageId = Signal.getUID();
     this.#currentMessageId = nextMessageId;
-    this.#setValue(nextValue, nextMessageId);
+    this.#setValue(_nextValue, nextMessageId);
   }
 }
 
