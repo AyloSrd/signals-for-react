@@ -21,7 +21,7 @@ function Inner({ countSignal, onSnapshot, onRerender }: InnerProps) {
   const count = useSatellite(countSignal);
   const [show, setShow] = React.useState(true);
 
-  onRerender?.();
+  onRerender();
 
   return (
     <>
@@ -31,11 +31,8 @@ function Inner({ countSignal, onSnapshot, onRerender }: InnerProps) {
       <button onClick={() => (count.value = count.snapshot + 1)}>
         increment inner
       </button>
-      {onSnapshot && (
-        <button onClick={() => onSnapshot(count.snapshot)}>
-          inner snapshot
-        </button>
-      )}
+      <button onClick={() => onSnapshot(count.snapshot)}>inner snapshot</button>
+
       {show && <p>inner count: {count.value}</p>}
       <br />
     </>
@@ -54,7 +51,7 @@ function MiddlePassingSignal({
   const count = useSatellite(countSignal);
   const [show, setShow] = React.useState(true);
 
-  onRerender?.();
+  onRerender();
 
   return (
     <>
@@ -64,11 +61,9 @@ function MiddlePassingSignal({
       <button onClick={() => (count.value = count.snapshot + 1)}>
         increment middle
       </button>
-      {onSnapshot && (
-        <button onClick={() => onSnapshot(count.snapshot)}>
-          middle snapshot
-        </button>
-      )}
+      <button onClick={() => onSnapshot(count.snapshot)}>
+        middle snapshot
+      </button>
       {show && <p>middle count: {count.value}</p>}
       <br />
       <Inner
@@ -125,7 +120,7 @@ export function OuterWithMiddlePassingSignal({
   const count = useSignal(0);
   const [show, setShow] = React.useState(true);
 
-  onRerender?.();
+  onRerender();
 
   return (
     <>
@@ -192,7 +187,6 @@ export function OuterWithInner({
 }: OuterProps) {
   const count = useSignal(0);
   const [show, setShow] = React.useState(true);
-
   onRerender();
 
   return (
@@ -200,7 +194,12 @@ export function OuterWithInner({
       <button onClick={() => setShow((s) => !s)}>
         {show ? 'hide outer' : 'show outer'}
       </button>
-      <button onClick={() => (count.value = count.snapshot + 1)}>
+      <button
+        onClick={() => {
+          console.log('clicked');
+          count.value = count.snapshot + 1;
+        }}
+      >
         increment outer
       </button>
       <button onClick={() => onSnapshot(count.snapshot)}>outer snapshot</button>

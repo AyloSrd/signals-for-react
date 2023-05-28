@@ -48,8 +48,12 @@ function handleInnerSuoteSnapshot(snap: number) {
   innerSnapshot = snap;
 }
 
-describe('Hooks, usePulledSIgnal, first child', () => {
-  describe('when a parent creates a signal and a child isolates it with usePulledSIgnal', () => {
+function waitFor(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+describe('when a parent creates a signal and a child isolates it with usePulledSIgnal', () => {
+  it('satellite should have recived the parents value', () => {
     const { getByText } = render(
       <OuterWithInner
         onRerender={handleOuterRerender}
@@ -58,12 +62,56 @@ describe('Hooks, usePulledSIgnal, first child', () => {
         onInnerSnapshot={handleInnerSuoteSnapshot}
         onMiddleRerender={handleMiddleRerender}
         onMiddleSnapshot={handleMiddleSnapshot}
-      />      
+      />
     );
-    it ('satellite should have recived the parents value', () => {
-      expect(getByText('inner count: 0')).toBeTruthy();
-      expect(getByText('outer count: 0')).toBeTruthy();
-    })
+    expect(getByText('inner count: 0')).toBeTruthy();
+    expect(getByText('outer count: 0')).toBeTruthy();
+
+    setVariablesToZero();
+  });
+  5;
+});
+describe('when the satellite updates', () => {
+  it('should have updated the parent too', () => {
+    const { getByText } = render(
+      <OuterWithInner
+        onRerender={handleOuterRerender}
+        onSnapshot={handleOuterSnapshot}
+        onInnerRerender={handleInnerRerender}
+        onInnerSnapshot={handleInnerSuoteSnapshot}
+        onMiddleRerender={handleMiddleRerender}
+        onMiddleSnapshot={handleMiddleSnapshot}
+      />
+    );
+    fireEvent.click(getByText('increment inner'));
+    fireEvent.click(getByText('increment inner'));
+    fireEvent.click(getByText('inner snapshot'));
+
+    expect(innerSnapshot).toBe(2);
+    expect(getByText('outer count: 2')).toBeTruthy();
+    setVariablesToZero();
+  });
+});
+
+describe('when the parent updates', async () => {
+  it('satellite should have updated the value', async() => {
+    const { getByText } = render(
+      <OuterWithInner
+        onRerender={handleOuterRerender}
+        onSnapshot={handleOuterSnapshot}
+        onInnerRerender={handleInnerRerender}
+        onInnerSnapshot={handleInnerSuoteSnapshot}
+        onMiddleRerender={handleMiddleRerender}
+        onMiddleSnapshot={handleMiddleSnapshot}
+      />
+    );
+    fireEvent.click(getByText('increment outer'));
+    await waitFor(1000);
+    fireEvent.click(getByText('inner snapshot'));
+
+    expect(innerSnapshot).toBe(1);
+    expect(getByText('outer count: 1')).toBeTruthy();
+    setVariablesToZero();
   });
 });
 /*

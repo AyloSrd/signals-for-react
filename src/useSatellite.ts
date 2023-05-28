@@ -23,7 +23,7 @@ export function useSatellite<T>(propsSignal: Signal<T>) {
     propsSignal.subscribe(signal[handleSubscribeSymbol])
   ).current;
 
-  React.useEffect(() => unsubscribe());
+  React.useEffect(() => unsubscribe(), []);
 
   return signal;
 }
