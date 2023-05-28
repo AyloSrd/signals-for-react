@@ -4,6 +4,8 @@ export const onValueUpdateFromSubscriberSymbol = Symbol(
   'onValueUpdateFromSubscriber'
 );
 export const handleSubscribeSymbol = Symbol('handleSubscribe');
+export const subscribeSymbol = Symbol('subscribe');
+export const unsubscribeFromSelfSymbol = Symbol('unsubscribeFromSelf');
 
 let id = 0;
 
@@ -32,7 +34,19 @@ export class Signal<T> {
       this.#currentMessageId = messageId;
       this.#setValue(nextValue, messageId, true);
     };
+
+    this[subscribeSymbol] = cb => {
+      this.#subscribers.add(cb);
+      return () => {
+        this.#unsubscribe(cb);
+      };
+    };
+
+    this[unsubscribeFromSelfSymbol] = () => {
+      this.#isSubscribedToSelf = false;
+    };
   }
+  
 
   #value: T;
   #isSubscribedToSelf: boolean = false;
@@ -47,34 +61,25 @@ export class Signal<T> {
     });
   };
 
+  #unsubscribe = (cb: MessageFunction<T>) => {
+    this.#subscribers.delete(cb);
+  }
+
   #setValue = (nextValue: T, messageId: number, isFromParent?: boolean) => {
     this.#value = nextValue;
 
     if (!isFromParent) this.#notifyParent?.(nextValue, messageId);
     if (this.#subscribers.size > 0) this.#publish();
     if (this.#isSubscribedToSelf) {
-      this.unsubscribeFromSelf();
+      this[unsubscribeFromSelfSymbol]();
       this.#selfSubscription();
     }
   };
 
   public [onValueUpdateFromSubscriberSymbol]: MessageFunction<T>;
   public [handleSubscribeSymbol]: MessageFunction<T>;
-
-  public unsubscribeFromSelf = () => {
-    this.#isSubscribedToSelf = false;
-  };
-
-  public subscribe = (cb: MessageFunction<T>): (() => void) => {
-    this.#subscribers.add(cb);
-    return () => {
-      this.unsubscribe(cb);
-    };
-  };
-
-  public unsubscribe = (cb: MessageFunction<T>) => {
-    this.#subscribers.delete(cb);
-  };
+  public [subscribeSymbol]: (cb: MessageFunction<T>) => (() => void);
+  public [unsubscribeFromSelfSymbol]: () => void;
 
   public get peep() {
     return this.#value;

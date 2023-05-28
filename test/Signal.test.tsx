@@ -2,6 +2,8 @@ import {
   createSignal,
   onValueUpdateFromSubscriberSymbol,
   handleSubscribeSymbol,
+  subscribeSymbol,
+  unsubscribeFromSelfSymbol,
 } from '../src/Signal';
 
 describe('Signal, local', () => {
@@ -58,7 +60,7 @@ describe('Signal, local', () => {
 
     expect(signal.value).toBe(0);
 
-    signal.unsubscribeFromSelf();
+    signal[unsubscribeFromSelfSymbol]();
     signal.set(prevValue => prevValue + 1);
 
     expect(signal.peep).toBe(1);
@@ -71,7 +73,7 @@ describe('Signal, remote subscriptions', () => {
     const signal = createSignal(0, () => {});
     const subscriber = createSignal(signal.peep, () => {});
 
-    signal.subscribe(subscriber[handleSubscribeSymbol]);
+    signal[subscribeSymbol](subscriber[handleSubscribeSymbol]);
 
     expect(subscriber.peep).toBe(0);
 
@@ -89,7 +91,7 @@ describe('Signal, remote subscriptions', () => {
       signal[onValueUpdateFromSubscriberSymbol]
     );
 
-    signal.subscribe(subscriber[handleSubscribeSymbol]);
+    signal[subscribeSymbol](subscriber[handleSubscribeSymbol]);
 
     // update the subscriber
     subscriber.set(prevValue => prevValue + 1);

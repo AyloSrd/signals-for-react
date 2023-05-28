@@ -3,6 +3,8 @@ import {
   onValueUpdateFromSubscriberSymbol,
   handleSubscribeSymbol,
   createSignal,
+  subscribeSymbol,
+  unsubscribeFromSelfSymbol,
 } from './Signal';
 import { useRerender } from './useRerender';
 import * as React from 'react';
@@ -18,13 +20,13 @@ export function useSatellite<T>(propsSignal: Signal<T>) {
   ).current;
 
   React.useEffect(() => {
-    const unsubscribe = propsSignal.subscribe(signal[handleSubscribeSymbol]);
+    const unsubscribe = propsSignal[subscribeSymbol](signal[handleSubscribeSymbol]);
     return () => {
       unsubscribe();
     };
   }, []);
 
-  signal.unsubscribeFromSelf();
+  signal[unsubscribeFromSelfSymbol]();
 
   return signal;
 }
