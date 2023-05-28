@@ -76,7 +76,7 @@ describe('Signal, local', () => {
     const signal = createSignal(0, handleGetValue);
 
     expect(signal.value).toBe(0);
-
+ 
     signal.set(0);
 
     expect(signal.peep).toBe(0);
