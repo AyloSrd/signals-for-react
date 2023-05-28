@@ -85,7 +85,7 @@ function MiddlePassingSatellite({
   const count = useSatellite(countSignal);
   const [show, setShow] = React.useState(true);
 
-  onRerender?.();
+  onRerender();
 
   return (
     <>
@@ -155,7 +155,7 @@ export function OuterWithMiddlePassingSatellite({
   const count = useSignal(0);
   const [show, setShow] = React.useState(true);
 
-  onRerender?.();
+  onRerender();
 
   return (
     <>
@@ -194,12 +194,7 @@ export function OuterWithInner({
       <button onClick={() => setShow((s) => !s)}>
         {show ? 'hide outer' : 'show outer'}
       </button>
-      <button
-        onClick={() => {
-          console.log('clicked');
-          count.value = count.snapshot + 1;
-        }}
-      >
+      <button onClick={() => (count.value = count.snapshot + 1)}>
         increment outer
       </button>
       <button onClick={() => onSnapshot(count.snapshot)}>outer snapshot</button>
@@ -241,6 +236,33 @@ export function OuterWithMemoizedInner({
         onSnapshot={onInnerSnapshot}
         onRerender={onInnerRerender}
       />
+    </>
+  );
+}
+
+function SimpleInner({ countSignal }: { countSignal: Signal<number> }) {
+  const count = useSatellite(countSignal);
+
+  return (
+    <>
+      <button
+        onClick={() => (count.value = count.snapshot + 1)}
+      >increment inner</button>
+      <p>inner count: {count.value}</p>
+    </>
+  );
+}
+
+export function SimpleUseCase() {
+  const count = useSignal(0);
+
+  return (
+    <>
+      <button
+        onClick={() => (count.value = count.snapshot + 1)}
+      >increment outer</button>
+      <p>outer count: {count.value}</p>
+      <SimpleInner countSignal={count} />
     </>
   );
 }

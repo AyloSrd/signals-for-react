@@ -22,14 +22,13 @@ export class Signal<T> {
 
     this[onValueUpdateFromSubscriberSymbol] = (nextValue, messageId) => {
       if (messageId === this.#currentMessageId) return;
-
       this.#currentMessageId = messageId;
       this.#setValue(nextValue, messageId);
     };
 
     this[handleSubscribeSymbol] = (nextValue, messageId) => {
       if (messageId === this.#currentMessageId) return;
-
+      
       this.#currentMessageId = messageId;
       this.#setValue(nextValue, messageId, true);
     };

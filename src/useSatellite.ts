@@ -17,13 +17,14 @@ export function useSatellite<T>(propsSignal: Signal<T>) {
     )
   ).current;
 
+  React.useEffect(() => {
+    const unsubscribe = propsSignal.subscribe(signal[handleSubscribeSymbol]);
+    return () => {
+      unsubscribe();
+    };
+  }, []);
+
   signal.unsubscribeFromSelf();
-
-  const unsubscribe = React.useRef(
-    propsSignal.subscribe(signal[handleSubscribeSymbol])
-  ).current;
-
-  React.useEffect(() => unsubscribe(), []);
 
   return signal;
 }
