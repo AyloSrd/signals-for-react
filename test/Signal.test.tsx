@@ -66,6 +66,22 @@ describe('Signal, local', () => {
     expect(signal.peep).toBe(1);
     expect(hasCalledCb).toBe(false);
   });
+
+  test('does not trigger the onGetValue callback when set to the same value', () => {
+    let hasCalledCb = false;
+
+    function handleGetValue() {
+      hasCalledCb = true;
+    }
+    const signal = createSignal(0, handleGetValue);
+
+    expect(signal.value).toBe(0);
+
+    signal.set(0);
+
+    expect(signal.peep).toBe(0);
+    expect(hasCalledCb).toBe(false);
+  });
 });
 
 describe('Signal, remote subscriptions', () => {

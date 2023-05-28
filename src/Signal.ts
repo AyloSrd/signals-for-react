@@ -66,6 +66,8 @@ export class Signal<T> {
   }
 
   #setValue = (nextValue: T, messageId: number, isFromParent?: boolean) => {
+    if(nextValue === this.#value) return;
+  
     this.#value = nextValue;
 
     if (!isFromParent) this.#notifyParent?.(nextValue, messageId);
