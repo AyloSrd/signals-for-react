@@ -9,9 +9,22 @@ export const unsubscribeFromSelfSymbol = Symbol('unsubscribeFromSelf');
 
 let id = 0;
 
+/**
+ * A class representing a Signal in the style of `createSignal` from SolidJS.
+ * Signals are used to manage reactive state and facilitate communication between components.
+ *
+ * @template T - The type of the Signal value.
+ */
 export class Signal<T> {
   static getUID = () => id++;
 
+  /**
+   * Constructs a new instance of the Signal class.
+   *
+   * @param {T} initialValue - The initial value of the Signal.
+   * @param {() => void} selfSubscription - A function to be called when the Signal is subscribed to itself.
+   * @param {MessageFunction<T>?} notifyParent - A callback function to notify the parent component of value updates.
+   */
   constructor(
     initialValue: T,
     selfSubscription: () => void,
@@ -83,15 +96,32 @@ export class Signal<T> {
   public [subscribeSymbol]: (cb: MessageFunction<T>) => (() => void);
   public [unsubscribeFromSelfSymbol]: () => void;
 
+  /**
+   * Gets the current value of the Signal, without subscribing the Signal to itself (no reactivity).
+   * 
+   * @type {T}
+   */
   public get peep() {
     return this.#value;
   }
 
+  /**
+   * Gets the current value of the Signal and subscribes the Signal to itself.
+   * This value is reactiven, therefore is used when any change in the Signal's value should trigger a re-render.
+   *
+   * @type {T}
+   */
   public get value() {
     this.#isSubscribedToSelf = true;
     return this.#value;
   }
-
+  
+  /**
+   * Sets the value of the Signal.
+   * Accepts either a new value or a function that receives the previous value and returns the new value.
+   *
+   * @param {T | ((prevValue: T) => T)} nextValue - The new value or function to calculate the new value.
+   */
   public set = (nextValue: T | ((prevValue: T) => T)) => {
     const _nextValue =
       nextValue instanceof Function ? nextValue(this.#value) : nextValue;
