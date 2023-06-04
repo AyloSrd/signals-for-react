@@ -2,41 +2,25 @@ import 'react-app-polyfill/ie11';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom/client';
 import { useSignal, useSatellite, Signal } from '../src';
+import { WrapUseSatellite } from './components/WrapUseSatellite';
+import { WrapUseSignal } from './components/WrapUseSignal';
+import { WrapUseSignalEffect } from './components/WrapUseSignalEffect';
 
-const Inner = ({ countSignal }: { countSignal: Signal<number> }) => {
-  const count = useSatellite(countSignal);
-  const [show, setShow] = React.useState(true);
-  return (
-    <>
-      <button onClick={() => setShow((s) => !s)}>
-        {show ? 'hide' : 'show'}
-      </button>
-      <button onClick={() => (count.set(prevCount => prevCount + 1))}>
-        increment
-      </button>
-      <button onClick={() => console.log(count.peep)}>snapshot</button>
-      {show && <p>count: {count.value}</p>}
-    </>
-  );
-};
+
+
+type Page = 'useSignal' | 'useSatellite' | 'useSignalEffect';
 
 const App = () => {
-  const count = useSignal(0);
-  const [show, setShow] = React.useState(true);
+  const page = useSignal<Page>('useSignal');
 
-  console.log('rerender');
   return (
     <>
-      <button onClick={() => setShow((s) => !s)}>
-        {show ? 'hide' : 'show'}
-      </button>
-      <button onClick={() => (count.set(prevCount => prevCount + 1))}>
-        increment
-      </button>
-      <button onClick={() => console.log(count.peep)}>snapshot</button>
-      {show && <p>count: {count.value}</p>}
-      Inner
-      <Inner countSignal={count} />
+      <button onClick={() => page.set('useSignal')}>useSignal</button>
+      <button onClick={() => page.set('useSatellite')}>useSatellite</button>
+      <button onClick={() => page.set('useSignalEffect')}>useSignalEffect</button>
+      {page.value === 'useSignal' && <WrapUseSignal />}
+      {page.value === 'useSatellite' && <WrapUseSatellite />}
+      {page.value === 'useSignalEffect' && <WrapUseSignalEffect />}
     </>
   );
 };
