@@ -7,7 +7,7 @@ import * as React from 'react';
  * Analogous to React's useEffect hook, but for Signals.
  *
  */
-export function useSignalEffect<T extends [...(Signal<any>[] | [])]>(
+export function useSignalEffect<T extends Signal<any>[] | []>(
   cb: (
     ...args: { [K in keyof T]: T[K] extends Signal<infer R> ? R : never } & {
       length: T['length'];
