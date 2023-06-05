@@ -18,9 +18,9 @@ const App = () => {
       <button onClick={() => page.set('useSignal')}>useSignal</button>
       <button onClick={() => page.set('useSatellite')}>useSatellite</button>
       <button onClick={() => page.set('useSignalEffect')}>useSignalEffect</button>
-      {page.value === 'useSignal' && <WrapUseSignal />}
-      {page.value === 'useSatellite' && <WrapUseSatellite />}
-      {page.value === 'useSignalEffect' && <WrapUseSignalEffect />}
+      {page.get() === 'useSignal' && <WrapUseSignal />}
+      {page.get() === 'useSatellite' && <WrapUseSatellite />}
+      {page.get() === 'useSignalEffect' && <WrapUseSignalEffect />}
     </>
   );
 };

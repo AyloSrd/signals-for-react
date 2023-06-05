@@ -31,9 +31,9 @@ function Inner({ countSignal, onPeep, onRerender }: InnerProps) {
       <button onClick={() => (count.set(prevCount => prevCount + 1))}>
         increment inner
       </button>
-      <button onClick={() => onPeep(count.peep)}>inner snapshot</button>
+      <button onClick={() => onPeep(count.current)}>inner snapshot</button>
 
-      {show && <p>inner count: {count.value}</p>}
+      {show && <p>inner count: {count.get()}</p>}
       <br />
     </>
   );
@@ -61,10 +61,10 @@ function MiddlePassingSignal({
       <button onClick={() => (count.set(prevCount => prevCount + 1))}>
         increment middle
       </button>
-      <button onClick={() => onPeep(count.peep)}>
+      <button onClick={() => onPeep(count.current)}>
         middle snapshot
       </button>
-      {show && <p>middle count: {count.value}</p>}
+      {show && <p>middle count: {count.get()}</p>}
       <br />
       <Inner
         countSignal={count}
@@ -95,10 +95,10 @@ function MiddlePassingSatellite({
       <button onClick={() => (count.set(prevCount => prevCount + 1))}>
         increment middle
       </button>
-      <button onClick={() => onPeep(count.peep)}>
+      <button onClick={() => onPeep(count.current)}>
         middle snapshot
       </button>
-      {show && <p>middle count: {count.value}</p>}
+      {show && <p>middle count: {count.get()}</p>}
       <br />
       <Inner
         countSignal={count}
@@ -130,8 +130,8 @@ export function OuterWithMiddlePassingSignal({
       <button onClick={() => (count.set(prevCount => prevCount + 1))}>
         increment outer
       </button>
-      <button onClick={() => onPeep(count.peep)}>outer snapshot</button>
-      {show && <p>outer count: {count.value}</p>}
+      <button onClick={() => onPeep(count.current)}>outer snapshot</button>
+      {show && <p>outer count: {count.get()}</p>}
 
       <MiddlePassingSignal
         countSignal={count}
@@ -165,8 +165,8 @@ export function OuterWithMiddlePassingSatellite({
       <button onClick={() => (count.set(prevCount => prevCount + 1))}>
         increment outer
       </button>
-      <button onClick={() => onPeep(count.peep)}>outer snapshot</button>
-      {show && <p>outer count: {count.value}</p>}
+      <button onClick={() => onPeep(count.current)}>outer snapshot</button>
+      {show && <p>outer count: {count.get()}</p>}
 
       <MiddlePassingSatellite
         countSignal={count}
@@ -197,8 +197,8 @@ export function OuterWithInner({
       <button onClick={() => (count.set(prevCount => prevCount + 1))}>
         increment outer
       </button>
-      <button onClick={() => onPeep(count.peep)}>outer snapshot</button>
-      {show && <p>outer count: {count.value}</p>}
+      <button onClick={() => onPeep(count.current)}>outer snapshot</button>
+      {show && <p>outer count: {count.get()}</p>}
 
       <Inner
         countSignal={count}
@@ -228,8 +228,8 @@ export function OuterWithMemoizedInner({
       <button onClick={() => (count.set(prevCount => prevCount + 1))}>
         increment outer
       </button>
-      <button onClick={() => onPeep(count.peep)}>outer snapshot</button>
-      {show && <p>outer count: {count.value}</p>}
+      <button onClick={() => onPeep(count.current)}>outer snapshot</button>
+      {show && <p>outer count: {count.get()}</p>}
 
       <MemoizedInner
         countSignal={count}
@@ -248,7 +248,7 @@ function SimpleInner({ countSignal }: { countSignal: Signal<number> }) {
       <button
         onClick={() => (count.set(prevCount => prevCount + 1))}
       >increment inner</button>
-      <p>inner count: {count.value}</p>
+      <p>inner count: {count.get()}</p>
     </>
   );
 }
@@ -261,7 +261,7 @@ export function SimpleUseCase() {
       <button
         onClick={() => (count.set(prevCount => prevCount + 1))}
       >increment outer</button>
-      <p>outer count: {count.value}</p>
+      <p>outer count: {count.get()}</p>
       <SimpleInner countSignal={count} />
     </>
   );

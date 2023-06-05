@@ -101,7 +101,7 @@ export class Signal<T> {
    * 
    * @type {T}
    */
-  public get peep() {
+  public get current() {
     return this.#value;
   }
 
@@ -111,7 +111,7 @@ export class Signal<T> {
    *
    * @type {T}
    */
-  public get value() {
+  public get() {
     this.#isSubscribedToSelf = true;
     return this.#value;
   }

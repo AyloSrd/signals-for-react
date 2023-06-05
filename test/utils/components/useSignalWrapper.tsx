@@ -26,9 +26,9 @@ export const SimpleUseSignalWrapper: React.FC<Props> = ({
         increment
       </button>
       {onPeep && (
-        <button onClick={() => onPeep(count.peep)}>snapshot</button>
+        <button onClick={() => onPeep(count.current)}>snapshot</button>
       )}
-      {show && <p>count: {count.value}</p>}
+      {show && <p>count: {count.get()}</p>}
       <br />
       {children}
     </>

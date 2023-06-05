@@ -14,8 +14,8 @@ export const WrapUseSignal = () => {
       <button onClick={() => count.set((prevCount) => prevCount + 1)}>
         increment
       </button>
-      <button onClick={() => console.log(count.peep)}>snapshot</button>
-      {show && <p>count: {count.value}</p>}
+      <button onClick={() => console.log(count.current)}>snapshot</button>
+      {show && <p>count: {count.get()}</p>}
     </>
   );
 };
