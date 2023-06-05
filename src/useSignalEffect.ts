@@ -1,5 +1,6 @@
 import { Signal, subscribeSymbol } from './Signal';
-import { SignalValue } from './types';
+import { SignalValues } from './types';
+import { extractSignalValues } from './utils/utils';
 import * as React from 'react';
 
 /**
@@ -9,22 +10,18 @@ import * as React from 'react';
  */
 export function useSignalEffect<T extends Signal<any>[] | []>(
   cb: (
-    ...args: { [K in keyof T]: T[K] extends Signal<infer R> ? R : never } & {
-      length: T['length'];
-    }[]
+    ...args: SignalValues<T>
   ) => void | (() => void),
   deps: T
 ) {
-  const prevValues = React.useRef(
-    deps.map(extractSignalType)
-  );
+  const prevValues = React.useRef(extractSignalValues(deps));
   const unsubscribes = React.useRef<(() => void)[]>([]);
 
   React.useEffect(() => {
     function handleSubscribe() {
       // @ts-ignore: have to figure that one out yet
       cb(...prevValues.current);
-      prevValues.current = deps.map(extractSignalType);
+      prevValues.current = extractSignalValues(deps);
     }
 
     for (const signal of deps) {
@@ -33,32 +30,4 @@ export function useSignalEffect<T extends Signal<any>[] | []>(
 
     return () => unsubscribes.current.forEach((unsubscribe) => unsubscribe());
   }, []);
-}
-
-declare function all<T extends any[] | []>( // note | [] here
-  values: T
-): Promise<{ [K in keyof T]: T[K] extends Signal<infer R> ? R : T[K] }>;
-
-declare function useSignalEffect2<T extends Signal<any>[] | []>(
-  cb: (
-    ...args: { [K in keyof T]: T[K] extends Signal<infer R> ? R : never }[]
-  ) => void | (() => void),
-  deps: T
-): void;
-
-class Maybe<T> {}
-
-type MaybeTuple = [Maybe<string>, Maybe<number>, Maybe<boolean>];
-
-type MaybeType<T> = T extends Maybe<infer MaybeType> ? MaybeType : never;
-type MaybeTypes<Tuple extends [...any[]]> = {
-  [Index in keyof Tuple]: MaybeType<Tuple[Index]>;
-} & { length: Tuple['length'] };
-
-let extractedTypes: MaybeTypes<MaybeTuple> = ['hello', 3, true];
-
-function extractSignalType<T extends Signal<any>>(
-  signal: T
-): SignalValue<T> {
-  return signal.peep;
 }
