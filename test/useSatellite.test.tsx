@@ -1,7 +1,4 @@
-import { fireEvent, render, renderHook } from '@testing-library/react';
-import { useSatellite, useSignal } from '../src';
-import { createSignal } from '../src/Signal';
-import { SimpleUseSignalWrapper } from './utils/components/useSignalWrapper';
+import { fireEvent, render } from '@testing-library/react';
 import {
   OuterWithMiddlePassingSignal,
   OuterWithMiddlePassingSatellite,

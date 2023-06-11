@@ -28,7 +28,7 @@ export function WrapUseSignalEffect() {
         type="text"
         name="text"
         id="text"
-        onChange={(e) => name.set(e.target.get())}
+        onChange={(e) => name.set(e.target.value)}
       />
       <ChildWithDirectSignal count={count} name={name} />
       <ChildWithSatellite countSatellite={count} nameSatellite={name} />

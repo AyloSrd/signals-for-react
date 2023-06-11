@@ -26,8 +26,11 @@ export function useSignalEffect<T extends Signal<any>[] | []>(
 
     for (const signal of deps) {
       unsubscribes.current.push(signal[subscribeSymbol](handleSubscribe));
-    }
-
+    }      
+    
+    // @ts-ignore: have to figure that one out yet
+    cb(...prevValues.current)
+  
     return () => unsubscribes.current.forEach((unsubscribe) => unsubscribe());
   }, []);
 }
