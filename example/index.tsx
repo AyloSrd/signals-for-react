@@ -15,12 +15,12 @@ const App = () => {
 
   return (
     <>
-      <button onClick={() => page.set('useSignal')}>useSignal</button>
-      <button onClick={() => page.set('useSatellite')}>useSatellite</button>
-      <button onClick={() => page.set('useSignalEffect')}>useSignalEffect</button>
-      {page.get() === 'useSignal' && <WrapUseSignal />}
-      {page.get() === 'useSatellite' && <WrapUseSatellite />}
-      {page.get() === 'useSignalEffect' && <WrapUseSignalEffect />}
+      <button onClick={() => page.value = 'useSignal'}>useSignal</button>
+      <button onClick={() => page.value = 'useSatellite'}>useSatellite</button>
+      <button onClick={() => page.value = 'useSignalEffect'}>useSignalEffect</button>
+      {page.sub() === 'useSignal' && <WrapUseSignal />}
+      {page.sub() === 'useSatellite' && <WrapUseSatellite />}
+      {page.sub() === 'useSignalEffect' && <WrapUseSignalEffect />}
     </>
   );
 };

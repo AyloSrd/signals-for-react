@@ -3,7 +3,7 @@ import { SimpleUseSignalWrapper } from './utils/components/useSignalWrapper';
 import * as React from 'react';
 
 describe('Hooks, useSignal, testing alone', () => {
-  it('the .get() getter should return the signal value when accessed', () => {
+  it('the .sub() getter should return the signal value when accessed', () => {
     const { getByText } = render(<SimpleUseSignalWrapper />);
     expect(getByText('count: 0')).toBeTruthy();
   });

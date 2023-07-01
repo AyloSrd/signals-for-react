@@ -10,11 +10,11 @@ describe('useSignalEffect, basic use cases', () => {
       let count = 0;
       renderHook(() => {
         useSignalEffect(() => {
-          count = signal.current;
+          count = signal.value;
         }, [signal]);
       });
 
-      signal.set(10);
+      signal.value = 10;
 
       expect(count).toBe(10);
     });
@@ -28,16 +28,16 @@ describe('useSignalEffect, basic use cases', () => {
 
       renderHook(() => {
         useSignalEffect(() => {
-          digit = digitSignal.current;
-          string = stringSignal.current;
+          digit = digitSignal.value;
+          string = stringSignal.value;
         }, [digitSignal, stringSignal]);
       });
 
-      digitSignal.set(10);
+      digitSignal.value = 10;
       expect(digit).toBe(10);
       expect(string).toBe('a');
 
-      stringSignal.set('ab');
+      stringSignal.value = 'ab';
       expect(digit).toBe(10);
       expect(string).toBe('ab');
     });
@@ -48,7 +48,7 @@ describe('useSignalEffect, basic use cases', () => {
       let count = 0;
       renderHook(() => {
         useSignalEffect(() => {
-          count = signal.current;
+          count = signal.value;
         }, [signal]);
       });
 
@@ -62,8 +62,8 @@ describe('useSignalEffect, basic use cases', () => {
       let string = 'a';
       renderHook(() => {
         useSignalEffect(() => {
-          digit = digitSignal.current;
-          string = stringSignal.current;
+          digit = digitSignal.value;
+          string = stringSignal.value;
         }, [digitSignal, stringSignal]);
       });
 
@@ -78,11 +78,11 @@ describe('useSignalEffect, basic use cases', () => {
       renderHook(() => {
         const satellite = useSatellite(signal);
         useSignalEffect(() => {
-          count = satellite.current;
+          count = satellite.value;
         }, [satellite]);
       });
 
-      signal.set(2);
+      signal.value = 2;
       expect(count).toBe(2);
     });
   });
@@ -100,14 +100,14 @@ describe('useSignalEffect, basic use cases', () => {
         }, [digitSignal, stringSignal]);
       });
 
-      digitSignal.set(5)
-      stringSignal.set('c')
+      digitSignal.value = 5
+      stringSignal.value = 'c'
 
-      digitSignal.set(10)
+      digitSignal.value = 10
       expect(digit).toBe(5);
       expect(string).toBe('c');
       
-      stringSignal.set('d')
+      stringSignal.value = 'd'
       expect(digit).toBe(10);
       expect(string).toBe('c');
 

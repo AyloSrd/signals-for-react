@@ -22,13 +22,13 @@ export const SimpleUseSignalWrapper: React.FC<Props> = ({
       <button onClick={() => setShow((s) => !s)}>
         {show ? 'hide' : 'show'}
       </button>
-      <button onClick={() => (count.set(prevCount => prevCount + 1))}>
+      <button onClick={() => (count.value += 1)}>
         increment
       </button>
       {onPeep && (
-        <button onClick={() => onPeep(count.current)}>snapshot</button>
+        <button onClick={() => onPeep(count.value)}>snapshot</button>
       )}
-      {show && <p>count: {count.get()}</p>}
+      {show && <p>count: {count.sub()}</p>}
       <br />
       {children}
     </>

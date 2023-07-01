@@ -4,7 +4,7 @@ import {
   useSignalEffect,
   type Signal,
 } from '../../src';
-import { useState } from 'react';
+import React from 'react';
 
 export function WrapUseSignalEffect() {
   const count = useSignal(0);
@@ -21,14 +21,14 @@ export function WrapUseSignalEffect() {
 
   return (
     <>
-      <button onClick={() => count.set((prevCount) => prevCount + 1)}>
+      <button onClick={() => count.value += 1}>
         increase
       </button>
       <input
         type="text"
         name="text"
         id="text"
-        onChange={(e) => name.set(e.target.value)}
+        onChange={(e) => name.value = e.target.value}
       />
       <ChildWithDirectSignal count={count} name={name} />
       <ChildWithSatellite countSatellite={count} nameSatellite={name} />
@@ -57,7 +57,7 @@ function ChildWithSatellite({
 
   return (
     <>
-      <button onClick={() => count.set((prevCount) => prevCount + 1)}>
+      <button onClick={() => count.value += 1}>
         increase
       </button>
     </>
@@ -83,7 +83,7 @@ function ChildWithDirectSignal({
 
   return (
     <>
-      <button onClick={() => count.set((prevCount) => prevCount + 1)}>
+      <button onClick={() => count.value += 1}>
         increase
       </button>
     </>

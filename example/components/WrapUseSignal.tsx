@@ -11,11 +11,11 @@ export const WrapUseSignal = () => {
       <button onClick={() => setShow((s) => !s)}>
         {show ? 'hide' : 'show'}
       </button>
-      <button onClick={() => count.set((prevCount) => prevCount + 1)}>
+      <button onClick={() => count.value += 1}>
         increment
       </button>
-      <button onClick={() => console.log(count.current)}>snapshot</button>
-      {show && <p>count: {count.get()}</p>}
+      <button onClick={() => console.log(count.value)}>snapshot</button>
+      {show && <p>count: {count.sub()}</p>}
     </>
   );
 };

@@ -43,12 +43,12 @@ export class Signal<T> {
 
     this[handleSubscribeSymbol] = (nextValue, messageId) => {
       if (messageId === this.#currentMessageId) return;
-      
+
       this.#currentMessageId = messageId;
       this.#setValue(nextValue, messageId, true);
     };
 
-    this[subscribeSymbol] = cb => {
+    this[subscribeSymbol] = (cb) => {
       this.#subscribers.add(cb);
       return () => {
         this.#unsubscribe(cb);
@@ -59,7 +59,6 @@ export class Signal<T> {
       this.#isSubscribedToSelf = false;
     };
   }
-  
 
   #value: T;
   #isSubscribedToSelf: boolean = false;
@@ -76,11 +75,11 @@ export class Signal<T> {
 
   #unsubscribe = (cb: MessageFunction<T>) => {
     this.#subscribers.delete(cb);
-  }
+  };
 
   #setValue = (nextValue: T, messageId: number, isFromParent?: boolean) => {
-    if(nextValue === this.#value) return;
-  
+    if (nextValue === this.#value) return;
+
     this.#value = nextValue;
 
     if (!isFromParent) this.#notifyParent?.(nextValue, messageId);
@@ -93,41 +92,37 @@ export class Signal<T> {
 
   public [onValueUpdateFromSubscriberSymbol]: MessageFunction<T>;
   public [handleSubscribeSymbol]: MessageFunction<T>;
-  public [subscribeSymbol]: (cb: MessageFunction<T>) => (() => void);
+  public [subscribeSymbol]: (cb: MessageFunction<T>) => () => void;
   public [unsubscribeFromSelfSymbol]: () => void;
 
   /**
    * Gets the current value of the Signal, without subscribing the Signal to itself (no reactivity).
-   * 
+   *
    * @type {T}
    */
-  public get current() {
+  public get value() {
     return this.#value;
   }
 
   /**
+   * Sets the value of the Signal.
+   * @param {T} nextValue - The new value or function to calculate the new value.
+   */
+  public set value(nextValue: T) {
+    const nextMessageId = Signal.getUID();
+    this.#currentMessageId = nextMessageId;
+    this.#setValue(nextValue, nextMessageId);
+  }
+
+  /**
    * Gets the current value of the Signal and subscribes the Signal to itself.
-   * This value is reactiven, therefore is used when any change in the Signal's value should trigger a re-render.
+   * This value is reactive, therefore is used when any change in the Signal's value should trigger a re-render.
    *
    * @type {T}
    */
-  public get() {
+  public sub() {
     this.#isSubscribedToSelf = true;
     return this.#value;
-  }
-  
-  /**
-   * Sets the value of the Signal.
-   * Accepts either a new value or a function that receives the previous value and returns the new value.
-   *
-   * @param {T | ((prevValue: T) => T)} nextValue - The new value or function to calculate the new value.
-   */
-  public set = (nextValue: T | ((prevValue: T) => T)) => {
-    const _nextValue =
-      nextValue instanceof Function ? nextValue(this.#value) : nextValue;
-    const nextMessageId = Signal.getUID();
-    this.#currentMessageId = nextMessageId;
-    this.#setValue(_nextValue, nextMessageId);
   }
 }
 
