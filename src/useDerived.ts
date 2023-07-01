@@ -1,7 +1,6 @@
 import { Signal, subscribeSymbol } from './Signal';
-import { SignalValues } from './types';
-import { useRerender } from './useRerender';
-import { extractSignalValues } from './utils/utils';
+import { useSignal } from './useSignal';
+import { createDerivedSignalProxy, extractSignalValues } from './utils/utils';
 import * as React from 'react';
 
 /**
@@ -9,20 +8,24 @@ import * as React from 'react';
  * Analogous to React's useEffect hook, but for Signals.
  *
  */
-export function useSignalEffect<T extends Signal<any>[] | [], D>(
+export function useSignalEffect<D, T extends Signal<any>[] | []>(
   cb: () => D,
   deps: T
 ) {
-const signal = React.useRef()
+  const signal = useSignal(cb());
+  const derivedSignal = React.useRef(createDerivedSignalProxy(signal)).current;
   const unsubscribes = React.useRef<(() => void)[]>([]);
 
   React.useEffect(() => {
-    signal.current 
+    function handleSubscribe() {
+      signal.value = cb();
+    }
     for (const signal of deps) {
-      unsubscribes.current.push(signal[subscribeSymbol](cb));
-    }      
-  
+      unsubscribes.current.push(signal[subscribeSymbol](handleSubscribe));
+    }
+
     return () => unsubscribes.current.forEach((unsubscribe) => unsubscribe());
   }, []);
-}
 
+  return derivedSignal;
+}
