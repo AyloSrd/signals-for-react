@@ -8,7 +8,7 @@ import * as React from 'react';
  * Analogous to React's useEffect hook, but for Signals.
  *
  */
-export function useSignalEffect<D, T extends Signal<any>[] | []>(
+export function useDerived<D, T extends Signal<any>[] | []>(
   cb: () => D,
   deps: T
 ) {

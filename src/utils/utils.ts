@@ -7,8 +7,13 @@ export function extractSignalValues<T extends Signal<any>[] | []>(signals: T): S
 export function createDerivedSignalProxy<T>(signal: Signal<T>): Signal<T> {
     return new Proxy(signal, {
       get(target: Signal<T>, prop: keyof Signal<T>) {
-        if (prop === 'value' || prop === 'sub') {
+        if (prop === 'value') {
           return target[prop];
+        }
+        if (prop === 'sub') {
+          return function (){
+            return target[prop]();
+          }
         }
         throw new Error(`Cannot access method '${String(prop)}'.`);
       },
