@@ -1,12 +1,12 @@
 import { renderHook } from '@testing-library/react';
 import { useSatellite, useSignalEffect } from '../src';
-import { createSignal } from '../src/Signal';
+import { createSignalInternal } from '../src/Signal';
 import * as React from 'react';
 
 describe('useSignalEffect, basic use cases', () => {
   describe('when you pass a signal to useSignalEffect, and the signal updates', () => {
     test('it should call the callback function', () => {
-      const signal = createSignal(0, () => {});
+      const signal = createSignalInternal(0, () => {});
       let count = 0;
       renderHook(() => {
         useSignalEffect(() => {
@@ -21,8 +21,8 @@ describe('useSignalEffect, basic use cases', () => {
   });
   describe('when you pass several signals to useSignalEffect, and one signal updates', () => {
     test('it should call the callback function', () => {
-      const digitSignal = createSignal(0, () => {});
-      const stringSignal = createSignal('a', () => {});
+      const digitSignal = createSignalInternal(0, () => {});
+      const stringSignal = createSignalInternal('a', () => {});
       let digit;
       let string;
 
@@ -44,7 +44,7 @@ describe('useSignalEffect, basic use cases', () => {
   });
   describe('when useSignalEffect is first called', () => {
     test('it initially calls the callback function', () => {
-      const signal = createSignal(1, () => {});
+      const signal = createSignalInternal(1, () => {});
       let count = 0;
       renderHook(() => {
         useSignalEffect(() => {
@@ -55,8 +55,8 @@ describe('useSignalEffect, basic use cases', () => {
       expect(count).toBe(1);
     });
     test('it initially calls the callback function once, even if watching multiple signals', () => {
-      const digitSignal = createSignal(1, () => {});
-      const stringSignal = createSignal('b', () => {});
+      const digitSignal = createSignalInternal(1, () => {});
+      const stringSignal = createSignalInternal('b', () => {});
 
       let digit = 0;
       let string = 'a';
@@ -73,7 +73,7 @@ describe('useSignalEffect, basic use cases', () => {
   });
   describe('when useSignalEffect is watching a setellite signal', () => {
     test('it updates whenever the satellite value changes', () => {
-      const signal = createSignal(1, () => {});
+      const signal = createSignalInternal(1, () => {});
       let count = 0;
       renderHook(() => {
         const satellite = useSatellite(signal);
@@ -88,8 +88,8 @@ describe('useSignalEffect, basic use cases', () => {
   });
   describe('when useSignalValue is calling the function callback', () => {
     test('it passes the previous values as parameters to the callback function', () => {
-      const digitSignal = createSignal(1, () => {});
-      const stringSignal = createSignal('b', () => {});
+      const digitSignal = createSignalInternal(1, () => {});
+      const stringSignal = createSignalInternal('b', () => {});
 
       let digit = 0;
       let string = 'a';

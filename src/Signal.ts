@@ -10,7 +10,7 @@ export const unsubscribeFromSelfSymbol = Symbol('unsubscribeFromSelf');
 let id = 0;
 
 /**
- * A class representing a Signal in the style of `createSignal` from SolidJS.
+ * A class representing a Signal in the style of `createSignalInternal` from SolidJS.
  * Signals are used to manage reactive state and facilitate communication between components.
  *
  * @template T - The type of the Signal value.
@@ -27,7 +27,7 @@ export class Signal<T> {
    */
   constructor(
     initialValue: T,
-    selfSubscription: () => void,
+    selfSubscription?: () => void,
     notifyParent?: MessageFunction<T>
   ) {
     this.#value = initialValue;
@@ -62,7 +62,7 @@ export class Signal<T> {
 
   #value: T;
   #isSubscribedToSelf: boolean = false;
-  #selfSubscription: () => void;
+  #selfSubscription?: () => void;
   #notifyParent?: MessageFunction<T>;
   #subscribers: Set<MessageFunction<T>> = new Set([]);
   #currentMessageId: number = -1;
@@ -86,7 +86,7 @@ export class Signal<T> {
     if (this.#subscribers.size > 0) this.#publish();
     if (this.#isSubscribedToSelf) {
       this[unsubscribeFromSelfSymbol]();
-      this.#selfSubscription();
+      this.#selfSubscription?.();
     }
   };
 
@@ -126,8 +126,18 @@ export class Signal<T> {
   }
 }
 
-export const createSignal = <T>(
+export const createSignalInternal = <T>(
   initialValue: T,
   selfSubscription: () => void,
   notifyParent?: MessageFunction<T>
 ): Signal<T> => new Signal(initialValue, selfSubscription, notifyParent);
+
+/**
+ * Creates a signal with the given initial value.
+ *
+ * @param {T} initialValue - The initial value of the signal.
+ * @return {Signal<T>} The newly created signal.
+ */
+export function createSignal<T>(initialValue: T): Signal<T> {
+  return new Signal(initialValue);
+}

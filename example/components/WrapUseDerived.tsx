@@ -1,7 +1,5 @@
 import {
   useSignal,
-  useSatellite,
-  useSignalEffect,
   useDerived,
   type Signal,
 } from '../../src';
