@@ -1,5 +1,5 @@
 import { render, renderHook, fireEvent } from '@testing-library/react';
-import { createSignalInternal, useDerived, useSatellite, useSignal } from '../src';
+import { createSignal, useDerived, useSatellite, useSignal } from '../src';
 import {
     WrapUseDerivedDotValue,
     WrapUseDerivedDotSub
@@ -9,7 +9,7 @@ import * as React from 'react';
 describe('useDerived, basic use cases', () => {
   describe('when you pass a signal to useDerived, and the signal updates', () => {
     test('it should call the callback function', () => {
-      const signal = createSignalInternal(0, () => {});
+      const signal = createSignal(0);
 
       const { result } = renderHook(() =>
         useDerived(() => signal.value * 2, [signal])
@@ -22,8 +22,8 @@ describe('useDerived, basic use cases', () => {
   });
   describe('when you pass several signals to useDerived, and one signal updates', () => {
     test('it should call the callback function', () => {
-      const digitSignal = createSignalInternal(0, () => {});
-      const stringSignal = createSignalInternal('a', () => {});
+      const digitSignal = createSignal(0);
+      const stringSignal = createSignal('a');
 
       const { result } = renderHook(() =>
         useDerived(
@@ -43,7 +43,7 @@ describe('useDerived, basic use cases', () => {
   });
   describe('when useDerived is first called', () => {
     test('it initially calls the callback function', () => {
-        const signal = createSignalInternal(1, () => {});
+        const signal = createSignal(1);
 
         const { result } = renderHook(() =>
           useDerived(() => signal.value * 2, [signal])
@@ -52,8 +52,8 @@ describe('useDerived, basic use cases', () => {
         expect(result.current.value).toBe(2);
     });
     test('it initially calls the callback function once, even if watching multiple signals', () => {
-        const digitSignal = createSignalInternal(0, () => {});
-        const stringSignal = createSignalInternal('a', () => {});
+        const digitSignal = createSignal(0);
+        const stringSignal = createSignal('a');
   
         const { result } = renderHook(() =>
           useDerived(
@@ -69,7 +69,7 @@ describe('useDerived, basic use cases', () => {
   
   describe('when useDerived is watching a setellite signal', () => {
     test('it updates whenever the satellite value changes', () => {
-      const signal = createSignalInternal(1, () => {});
+      const signal = createSignal(1);
 
       const { result } = renderHook(() => {
         const satellite = useSatellite(signal);

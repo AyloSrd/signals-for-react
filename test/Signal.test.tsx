@@ -1,4 +1,5 @@
 import {
+  createSignal,
   createSignalInternal,
   onValueUpdateFromSubscriberSymbol,
   handleSubscribeSymbol,
@@ -8,27 +9,27 @@ import {
 
 describe('Signal, local', () => {
   test('returns the value when accessed through signal.sub() and signal.value', () => {
-    const signal = createSignalInternal(0, () => {});
+    const signal = createSignal(0);
     expect(signal.sub()).toBe(0);
     expect(signal.value).toBe(0);
   });
 
   test('updates the value when the setter is called', () => {
-    const signal = createSignalInternal(0, () => {});
+    const signal = createSignal(0);
     signal.value += 1;
     expect(signal.sub()).toBe(1);
     expect(signal.value).toBe(1);
   });
 
   test('setter can take a non-function value', () => {
-    const signal = createSignalInternal(0, () => {});
+    const signal = createSignal(0);
     signal.value = 1;
     expect(signal.sub()).toBe(1);
     expect(signal.value).toBe(1);
   });
 
   test('setter passes previous value if its argument is a function', () => {
-    const signal = createSignalInternal(5, () => {});
+    const signal = createSignal(5);
     signal.value *= 2;
     expect(signal.sub()).toBe(10);
     expect(signal.value).toBe(10);
@@ -86,8 +87,8 @@ describe('Signal, local', () => {
 
 describe('Signal, remote subscriptions', () => {
   test('update the value in subscriber', () => {
-    const signal = createSignalInternal(0, () => {});
-    const subscriber = createSignalInternal(signal.value, () => {});
+    const signal = createSignal(0);
+    const subscriber = createSignal(signal.value);
 
     signal[subscribeSymbol](subscriber[handleSubscribeSymbol]);
 
@@ -100,7 +101,7 @@ describe('Signal, remote subscriptions', () => {
   });
 
   test('subscriber notifies parent of value change, and parent updates', () => {
-    const signal = createSignalInternal(0, () => {});
+    const signal = createSignal(0);
     const subscriber = createSignalInternal(
       signal.value,
       () => {},
