@@ -1,4 +1,57 @@
-# 📡 Signals for React
+# 📡 Signals for React (SFR)
+
+Signals for React (SFR) is a library that aims to provide signal primitives for React applications without relying on React internals. SFR signals combine the functionalities of both refs and state. 
+
+They store a value that can be accessed and modified by accessing the `value` property of the signal. Additionally, signal can trigger a re-render if the component is subscribed to updates through the `sub` method of the signal.
+
+Each signal can be bound to the component (and children) through the useSatellite hook; finally, signals come with several utilities, such useSignalEffect or useDerived (respectively the signal version of useEffect and useMemo).
+
+## Installation
+
+You can install Signals for React (SFR) using npm:
+```sh
+# Using npm
+npm install signals-for-react
+```
+or using Yarn:
+```sh
+# Using Yarn
+yarn add signals-for-react
+```
+
+## useSignal
+
+`useSignal` is the main hook of S`useState` and `useRef` to provide a reactive piece of state. Similar to `useRef`, it returns an object that stores the value, rather than a getter and a setter.
+
+```tsx
+const Doubler: React.FC = () => {
+  const count = useSignal(0)
+ ...
+}
+```
+
+To access the value of the signal, you can use the `.value` property. This is similar to using `.current` with React's refs and does not trigger any UI updates. It is recommended to use the `.value` property in callbacks and event handlers, as it always reflects the most up-to-date value and avoids unnecessary re-renders.
+
+```tsx
+function handleSubmit() {
+  onSubmit({
+    name: name.value,
+    age: age.value
+  })
+}
+```
+
+In order to make the signal reactive, the component needs to call the `.sub()` method. This method subscribes the component to any updates to the signal and also returns the current value of the signal.
+
+```tsx
+<p>{`The count is ${count.sub()}`}</p>
+```
+
+To update the value of a signal, you can simply reassign the value using the `.value` property. This will update the value of the signal and trigger UI updates if the `.sub()` method is called on the same signal somewhere in the component or down the tree. It will also trigger updates for any other signals that depend on it, including satellite and derived readonly signals.
+```tsx
+<button onClick={() => count.value *= 2}>Double</button>
+```
+Subscribing to a signal will cause the component using useSignal to re-render, even if the update or subscription is done down the tree. However, you can bind the signal to the children using `useSatellite` to prevent unnecessary re-renders, as we will see in the next chapters.
 
 # DTS React User Guide
 
