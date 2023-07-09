@@ -4,10 +4,14 @@ import { createDerivedSignalProxy, extractSignalValues } from './utils/utils';
 import * as React from 'react';
 
 /**
- * Custom React hook that triggers a callback function when the values of the provided Signal dependencies change.
- * Analogous to React's useEffect hook, but for Signals.
- *
+ * Hook that takes a callback function returning a specific value and an array of signal dependencies and returns a derived readonly signal.
+ * Analogous to React's useMemo hook, but for Signals.
+ * 
+ * @param {() => D} cb - The callback function that returns the derived value.
+ * @param {T} deps - The array of dependencies that trigger the recalculation of the derived value.
+ * @return {DerivedSignal} The derived signal that contains the calculated value based on the callback function and dependencies.
  */
+
 export function useDerived<D, T extends Signal<any>[] | []>(
   cb: () => D,
   deps: T

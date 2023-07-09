@@ -3,10 +3,14 @@ import { SignalValues } from './types';
 import { extractSignalValues } from './utils/utils';
 import * as React from 'react';
 
+
 /**
- * Custom React hook that triggers a callback function when the values of the provided Signal dependencies change.
+ * Executes a callback function whenever the signal dependencies change.
  * Analogous to React's useEffect hook, but for Signals.
- *
+ * 
+ * @param {(...args: SignalValues<T>) => void | (() => void)} cb - The callback function to be executed.
+ * @param {T} deps - The dependencies that trigger the callback function.
+ * @return {void}
  */
 export function useSignalEffect<T extends Signal<any>[] | []>(
   cb: (

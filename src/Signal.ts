@@ -10,7 +10,6 @@ export const unsubscribeFromSelfSymbol = Symbol('unsubscribeFromSelf');
 let id = 0;
 
 /**
- * A class representing a Signal in the style of `createSignalInternal` from SolidJS.
  * Signals are used to manage reactive state and facilitate communication between components.
  *
  * @template T - The type of the Signal value.
@@ -23,7 +22,7 @@ export class Signal<T> {
    *
    * @param {T} initialValue - The initial value of the Signal.
    * @param {() => void} selfSubscription - A function to be called when the Signal is subscribed to itself.
-   * @param {MessageFunction<T>?} notifyParent - A callback function to notify the parent component of value updates.
+   * @param {MessageFunction<T>?} notifyParent - A callback function to notify the parent Signal of value updates.
    */
   constructor(
     initialValue: T,

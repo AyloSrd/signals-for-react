@@ -1,12 +1,16 @@
 import {
   createSignalInternal,
-  onValueUpdateFromSubscriberSymbol,
-  handleSubscribeSymbol,
   unsubscribeFromSelfSymbol
 } from './Signal';
 import { useRerender } from './useRerender';
 import * as React from 'react';
 
+/**
+ * Creates a signal of the provided value.
+ *
+ * @param {T} initialValue - The initial value of the signal.
+ * @returns {Signal} The created signal.
+ */
 export function useSignal<T>(initialValue: T) {
   const rerender = useRerender();
 
