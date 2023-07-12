@@ -21,7 +21,7 @@ yarn add signals-for-react
 
 ## useSignal
 
-`useSignal` is the main hook of S`useState` and `useRef` to provide a reactive piece of state. Similar to `useRef`, it returns an object that stores the value, rather than a getter and a setter.
+`useSignal` is the main hook of SFR; it combines the `useState` and `useRef` to provide a reactive piece of state. Similar to `useRef`, it returns an object that stores the value, rather than a getter and a setter.
 
 ```tsx
 const Doubler: React.FC = () => {
@@ -51,7 +51,10 @@ To update the value of a signal, you can simply reassign the value using the `.v
 ```tsx
 <button onClick={() => count.value *= 2}>Double</button>
 ```
-Subscribing to a signal will cause the component using useSignal to re-render, even if the update or subscription is done down the tree. However, you can bind the signal to the children using `useSatellite` to prevent unnecessary re-renders, as we will see in the next chapters.
+Subscribing to a signal will cause the component using `useSignal` to re-render, even if the update or subscription is done down the tree. However, you can bind the signal to the children using `useSatellite` to prevent unnecessary re-renders, as we will see in the next chapters.
+
+## useSatellite
+A common consequence of lifting the state up in React is that updating the state down the component tree will trigger a re-render of the higher-level parent component that holds the state, even if some of the intermediate components do not directly use or rely on that state. This is because any updates to the shared state will propagate upwards in the component tree and trigger re-renders in all the components that are part of that branch, regardless of whether they actually use the state or not.
 
 # DTS React User Guide
 
