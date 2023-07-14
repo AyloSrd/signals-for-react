@@ -2,6 +2,8 @@
 
 Signals for React (SFR) is a library that aims to provide signal primitives for React applications without relying on React internals. SFR signals combine the functionalities of both refs and state. 
 
+Signals scope is to limit unnecessary re-rendering as much as possible, while keeping updated values accessible all over your React app.
+
 They store a value that can be accessed and modified by accessing the `value` property of the signal. Additionally, signal can trigger a re-render if the component is subscribed to updates through the `sub` method of the signal.
 
 Each signal can be bound to the component (and children) through the useSatellite hook; finally, signals come with several utilities, such useSignalEffect or useDerived (respectively the signal version of useEffect and useMemo).
@@ -18,6 +20,17 @@ or using Yarn:
 # Using Yarn
 yarn add signals-for-react
 ```
+
+## Signals, the basics
+A signal is a React primitive that stores a value, and can be subscribed.
+It consists in an object with a `.value` property and `sub()` method.
+
+The main concept to retain when it comes to SFR signals, is that they have to be bound to a component.
+
+The `.value` property is a getter and setter at the same time. It allows to retireve an up to date value, and to re-assign it. Accessing the getter doesn't subscribe the component to the signal, so won't trigger any re-render.
+
+In order to subscribe to it, you need to call the .`sub()` method. This will result in the component bound to said signal to re-render
+
 
 ## useSignal
 
@@ -54,7 +67,33 @@ To update the value of a signal, you can simply reassign the value using the `.v
 Subscribing to a signal will cause the component using `useSignal` to re-render, even if the update or subscription is done down the tree. However, you can bind the signal to the children using `useSatellite` to prevent unnecessary re-renders, as we will see in the next chapters.
 
 ## useSatellite
-A common consequence of lifting the state up in React is that updating the state down the component tree will trigger a re-render of the higher-level parent component that holds the state, even if some of the intermediate components do not directly use or rely on that state. This is because any updates to the shared state will propagate upwards in the component tree and trigger re-renders in all the components that are part of that branch, regardless of whether they actually use the state or not.
+A common consequence of lifting the state up in React is that updating the state down the component tree will trigger a re-render of the higher-level parent component that holds the state, even if some of the intermediate components do not directly use or rely on that state.
+
+The same applies to `useSignal`. Due to the way React is build, in fact, SFR signals don't automatically bind to specific components, or pieces of UI (opposite to what SolidJS for instance would do).
+
+Let's consider an example where we are building a counter app. The count signal is managed by our `<Counter />` component, which does not directly subscribe to it. Similarly, the `<Increase />` and `<Decrease />`, children components, buttons only need to access the `.value` getter without subscribing to it. However, if the `<Display />`component calls `.sub()` to update the UI, the entire component tree will unnecessarily re-render.
+
+To avoid this, you can bind the signal to the component subscribing to it, by using `useSatellite`. This hook takes a signal as an argument, and returns a brand new one, storing the same value. Whenever one of the two signals updates, the other one will too (synchronously). However, the re-rendering will only propagate downwards, and the parents or same level components bound to the signal won't re-render unlsess subscribed. 
+
+```tsx
+const Display: React.FC<{ countSatellite: Signal<number>}> = ({ countSatellite }) =>  {
+  const count = useSatellite(countSatellite)
+
+  return <p>{`The count is ${count.sub()}`}</p>
+}
+
+function Counter() {
+  const count = useSignal(0)
+
+  return (<main>
+    <Display countSatellite={count} />
+    <Increase onIncrease={() => count.value += 1} />
+    <Decrease onDecrease={() => count.value -= 1} />
+  </main>)
+}
+```
+
+### React.memo and useSatellite
 
 # DTS React User Guide
 
