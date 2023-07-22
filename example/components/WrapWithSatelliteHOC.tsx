@@ -1,8 +1,8 @@
 import { useSignal, satellite, type Signal } from '../../src';
 import { useState } from 'react';
 
-const Inner = satellite(
-  ({ count, name }: { count: Signal<number>; name: Signal<string> }) => {
+const Inner = satellite<{ count: Signal<number>; name: Signal<string> }>(
+  ({ count, name }) => {
     const [show, setShow] = useState(true);
     console.log('render inner');
     return (
