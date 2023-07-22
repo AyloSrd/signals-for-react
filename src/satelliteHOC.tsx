@@ -52,6 +52,11 @@ export function satellite<P extends {}>(Component: React.ComponentType<P>) {
   };
 }
 
+export const meomizedSatellite = <P extends {}>(Component: React.ComponentType<P>, propsAreEqual?: ((prevProps: object, nextProps: object) => boolean) | undefined) => {
+    const Satellite = satellite<P>(Component)
+    return React.memo<P>(Satellite, propsAreEqual)
+}
+
 function createSatellite<T>(signal: Signal<T>, rerender: () => void) {
   const satellite = createSignalInternal(
     signal.value,

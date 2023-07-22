@@ -1,8 +1,8 @@
 import { useSignal, satellite, type Signal } from '../../src';
-import { useState } from 'react';
+import React, { useState } from 'react';
 
-const Inner = satellite<{ count: Signal<number>; name: Signal<string> }>(
-  ({ count, name }) => {
+const Inner: React.FC<{ count: Signal<number>; name: Signal<string> }> =
+  satellite(({ count, name }) => {
     const [show, setShow] = useState(true);
     console.log('render inner');
     return (
@@ -27,8 +27,7 @@ const Inner = satellite<{ count: Signal<number>; name: Signal<string> }>(
         )}
       </>
     );
-  }
-);
+  });
 
 export const WrapSatelliteHOC = () => {
   const count = useSignal(0);
