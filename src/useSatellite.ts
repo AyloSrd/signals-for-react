@@ -1,12 +1,11 @@
 import {
   Signal,
-  onValueUpdateFromSubscriberSymbol,
   handleSubscribeSymbol,
-  createSignalInternal,
   subscribeSymbol,
   unsubscribeFromSelfSymbol,
 } from './Signal';
 import { useRerender } from './useRerender';
+import { createSatellite, callFnIf } from './utils/utils';
 import * as React from 'react';
 
 /**
@@ -19,16 +18,25 @@ import * as React from 'react';
 
 export function useSatellite<T>(propsSignal: Signal<T>) {
   const rerender = useRerender();
-  const signal = React.useRef(
-    createSignalInternal(
-      propsSignal.value,
-      rerender,
-      propsSignal[onValueUpdateFromSubscriberSymbol]
-    )
-  ).current;
+  const isFirstHookCall = React.useRef(true)
+
+  const [signal, unsubscribe] = React.useRef(
+    callFnIf(() => {
+      const satellite = createSatellite(
+        propsSignal,
+        rerender,
+      )
+
+      if (isFirstHookCall.current) isFirstHookCall.current = false
+      
+      return satellite
+
+    },
+    () => isFirstHookCall.current
+    ),
+  ).current!
 
   React.useEffect(() => {
-    const unsubscribe = propsSignal[subscribeSymbol](signal[handleSubscribeSymbol]);
     return () => {
       unsubscribe();
     };

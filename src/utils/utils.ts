@@ -1,3 +1,4 @@
+import { createSignalInternal, handleSubscribeSymbol, onValueUpdateFromSubscriberSymbol, subscribeSymbol } from '../Signal';
 import { Signal, SignalValues } from '../types';
 
 export function extractSignalValues<T extends Signal<any>[] | []>(signals: T): SignalValues<T> {
@@ -22,3 +23,19 @@ export function createDerivedSignalProxy<T>(signal: Signal<T>): Signal<T> {
       },
     });
   }
+
+export function createSatellite<T>(signal: Signal<T>, selfSubscription: () => void) {
+  const satellite = createSignalInternal(
+    signal.value,
+    selfSubscription,
+    signal[onValueUpdateFromSubscriberSymbol]
+  );
+  const unsubscribe = signal[subscribeSymbol](satellite[handleSubscribeSymbol]);
+
+  return [satellite, unsubscribe] as const;
+}
+
+export function callFnIf<T>(fn: () => T, condition: () => boolean) {
+  if(!condition()) return
+  return fn()
+}
