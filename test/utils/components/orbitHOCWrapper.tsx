@@ -1,11 +1,11 @@
-import { Signal, useSignal, useOrbit } from '../../../src';
+import { Signal, useSignal, orbit } from '../../../src';
 import React, { useState, type FC } from 'react';
 
-interface SimpleUseOrbitProps {
+interface SimpleOrbitProps {
   onRerender: (where: 'inner' | 'outer') => void;
 }
 
-export const SimpleUseOrbitWrapper: FC<SimpleUseOrbitProps> = ({ onRerender }) => {
+export const SimpleOrbitWrapper: FC<SimpleOrbitProps> = ({ onRerender }) => {
   const count = useSignal(0);
   const name = useSignal('');
   const [show, setShow] = useState(true);
@@ -37,10 +37,9 @@ export const SimpleUseOrbitWrapper: FC<SimpleUseOrbitProps> = ({ onRerender }) =
 type InnerProps = {
   count: Signal<number>;
   name: Signal<string>;
-} & SimpleUseOrbitProps;
+} & SimpleOrbitProps;
 
-const Inner: FC<InnerProps> = ({ onRerender, ...props }) => {
-  const { count, name } = useOrbit(props);
+const Inner: FC<InnerProps> = orbit(({ count, name, onRerender }) => {
   const [show, setShow] = useState(true);
 
   onRerender('inner');
@@ -63,4 +62,4 @@ const Inner: FC<InnerProps> = ({ onRerender, ...props }) => {
       ) : null}
     </div>
   );
-};
+});
