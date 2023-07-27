@@ -8,10 +8,12 @@ import { WrapUseSignalEffect } from './components/WrapUseSignalEffect';
 import { WrapUseDerived } from './components/WrapUseDerived';
 import { WrapGlobalSignal } from './components/WrapGlobalSignal';
 import { WrapOrbitHOC } from './components/WrapOrbitHOC'
+import { WrapUseOrbit } from './components/WrapUseOrbit';
 
 type Page =
   | 'createSignal'
   | 'orbitHOC'
+  | 'useOrbit'
   | 'useSignal'
   | 'useSatellite'
   | 'useSignalEffect'
@@ -33,6 +35,9 @@ const App = () => {
       <button onClick={() => (page.value = 'createSignal')}>
         createSignal
       </button>
+      <button onClick={() => (page.value = 'useOrbit')}>
+        useOrbit
+      </button>
       <button onClick={() => (page.value = 'orbitHOC')}>
         orbitHOC
       </button>
@@ -42,6 +47,7 @@ const App = () => {
       {page.sub() === 'useSatellite' && <WrapUseSatellite />}
       {page.sub() === 'useSignalEffect' && <WrapUseSignalEffect />}
       {page.sub() === 'useDerived' && <WrapUseDerived />}
+      {page.sub() === 'useOrbit' && <WrapUseOrbit />}
       {page.sub() === 'createSignal' && <WrapGlobalSignal />}
       {page.sub() === 'orbitHOC' && <WrapOrbitHOC />}
     </>
