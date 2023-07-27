@@ -1,5 +1,5 @@
 export { createSignal } from './Signal'
-export { satellite } from './satelliteHOC'
+export { orbit } from './orbitHOC'
 export { useSignal } from './useSignal';
 export { useSatellite } from './useSatellite';
 export { useSignalEffect } from './useSignalEffect';

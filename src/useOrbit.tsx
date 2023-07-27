@@ -4,34 +4,34 @@ import { useRerender } from './useRerender';
 import { Signal, SignalValue } from './types';
 import { callFnIf, createSatellite } from './utils/utils';
 
+type ExtractSignals<P extends {}> = {
+  [K in keyof P]: P[K] extends Signal<infer T> ? Signal<T> : never;
+};
+
 export function useOrbit<P extends {}>(props: P) {
   const rerender = useRerender();
   const isFirstHookCall = React.useRef(true);
 
-  const {
-    satellites,
-    unsubscribeFns
-  } = React.useRef(
+  const { satellites, unsubscribeFns } = React.useRef(
     callFnIf(
       () => {
-        const satellites: Partial<P> & Record<string, Signal<any>> = {};
+        const satellites = {} as ExtractSignals<P>;
         const unsubscribeFns: (() => void)[] = [];
         for (const propKey in props) {
           const prop = props[propKey];
           if (prop instanceof SignalClass) {
             const [satellite, unsubscribe] = createSatellite(prop, rerender);
 
-            satellites[propKey] = satellite as (Partial<P> &
-              Record<string, Signal<any>>)[Extract<keyof P, string>] &
-              Signal<SignalValue<typeof prop>>;
+            satellites[propKey] =
+              satellite as ExtractSignals<P>[typeof propKey];
             unsubscribeFns.push(unsubscribe);
           }
         }
 
-        return ({
-            satellites,
-            unsubscribeFns
-        })
+        return {
+          satellites,
+          unsubscribeFns,
+        };
       },
       () => isFirstHookCall.current
     )

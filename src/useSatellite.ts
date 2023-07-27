@@ -1,7 +1,5 @@
 import {
   Signal,
-  handleSubscribeSymbol,
-  subscribeSymbol,
   unsubscribeFromSelfSymbol,
 } from './Signal';
 import { useRerender } from './useRerender';
