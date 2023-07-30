@@ -5,7 +5,7 @@ export const WrapUseSatellite = () => {
   const count = useSignal(0);
   const [show, setShow] = useState(true);
 
-  console.log('rerender');
+  console.log('rerender parent');
   return (
     <>
       <button onClick={() => setShow((s) => !s)}>
@@ -25,6 +25,8 @@ export const WrapUseSatellite = () => {
 function Inner({ countSignal }: { countSignal: Signal<number> }) {
   const count = useSatellite(countSignal);
   const [show, setShow] = useState(true);
+  console.log('rerender child');
+
   return (
     <>
       <button onClick={() => setShow((s) => !s)}>

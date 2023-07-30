@@ -1,12 +1,16 @@
 import * as React from 'react';
-import { Signal as SignalClass, unsubscribeFromSelfSymbol } from './Signal';
+import { Signal, unsubscribeFromSelfSymbol } from './Signal';
 import { useRerender } from './useRerender';
-import { Signal, SignalValue } from './types';
+import { type ExtractSignalsFromObject } from './types';
 import { callFnIf, createSatellite } from './utils/utils';
 
-type ExtractSignals<P extends {}> = {
-  [K in keyof P]: P[K] extends Signal<infer T> ? Signal<T> : never;
-};
+/**
+ * Hook that generates a collection of satellites by identifying signals from the provided props object.
+ *
+ * @template P - The type of the props object
+ * @param {P} props - The props object containing the signals
+ * @return {ExtractSignalsFromObject<P>} - The collection of satellites generated from the signals
+ */
 
 export function useOrbit<P extends {}>(props: P) {
   const rerender = useRerender();
@@ -15,15 +19,15 @@ export function useOrbit<P extends {}>(props: P) {
   const { satellites, unsubscribeFns } = React.useRef(
     callFnIf(
       () => {
-        const satellites = {} as ExtractSignals<P>;
+        const satellites = {} as ExtractSignalsFromObject<P>;
         const unsubscribeFns: (() => void)[] = [];
         for (const propKey in props) {
           const prop = props[propKey];
-          if (prop instanceof SignalClass) {
+          if (prop instanceof Signal) {
             const [satellite, unsubscribe] = createSatellite(prop, rerender);
 
             satellites[propKey] =
-              satellite as ExtractSignals<P>[typeof propKey];
+              satellite as ExtractSignalsFromObject<P>[typeof propKey];
             unsubscribeFns.push(unsubscribe);
           }
         }

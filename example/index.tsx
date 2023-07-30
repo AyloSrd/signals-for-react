@@ -1,7 +1,7 @@
 import 'react-app-polyfill/ie11';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom/client';
-import { useSignal, useSatellite, Signal } from '../src';
+import { useSignal } from '../src';
 import { WrapUseSatellite } from './components/WrapUseSatellite';
 import { WrapUseSignal } from './components/WrapUseSignal';
 import { WrapUseSignalEffect } from './components/WrapUseSignalEffect';

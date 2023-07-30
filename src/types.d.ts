@@ -7,3 +7,6 @@ export type SignalValues<T> = { [K in keyof T]: SignalValue<T[K]> } & {
   length: T['length'];
 }[];
 export type DerivedSignal<T> = Proxy<Signal<T>>
+export type ExtractSignalsFromObject<P extends {}> = {
+  [K in keyof P]: P[K] extends Signal<infer T> ? Signal<T> : never;
+};

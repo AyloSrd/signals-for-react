@@ -6,7 +6,7 @@ Signals scope is to limit unnecessary re-rendering as much as possible, while ke
 
 They store a value that can be accessed and modified by accessing the `value` property of the signal. Additionally, signal can trigger a re-render if the component is subscribed to updates through the `sub` method of the signal.
 
-Each signal can be bound to the component (and children) through the useSatellite hook; finally, signals come with several utilities, such useSignalEffect or useDerived (respectively the signal version of useEffect and useMemo).
+Each signal can be bound to the component (and children) by creating satellites of said signal; finally, signals come with several utilities, such useSignalEffect or useDerived (respectively the signal version of useEffect and useMemo).
 
 ## Installation
 
@@ -32,7 +32,7 @@ The `.value` property is a getter and setter at the same time. It allows to reti
 In order to subscribe to it, you need to call the .`sub()` method. This will result in the component bound to said signal to re-render
 
 
-## useSignal
+### useSignal
 
 `useSignal` is the main hook of SFR; it combines the `useState` and `useRef` to provide a reactive piece of state. Similar to `useRef`, it returns an object that stores the value, rather than a getter and a setter.
 
@@ -60,13 +60,25 @@ In order to make the signal reactive, the component needs to call the `.sub()` m
 <p>{`The count is ${count.sub()}`}</p>
 ```
 
-To update the value of a signal, you can simply reassign the value using the `.value` property. This will update the value of the signal and trigger UI updates if the `.sub()` method is called on the same signal somewhere in the component or down the tree. It will also trigger updates for any other signals that depend on it, including satellite and derived readonly signals.
+To update the value of a signal, you can simply reassign the value using the `.value` property. This will update the value of the signal and trigger UI updates if the `.sub()` method is called on the same signal somewhere in the component or down the tree. It will also trigger updates for any other signals that depend on it, including satellites and derived readonly signals.
 ```tsx
 <button onClick={() => count.value *= 2}>Double</button>
 ```
-Subscribing to a signal will cause the component using `useSignal` to re-render, even if the update or subscription is done down the tree. However, you can bind the signal to the children using `useSatellite` to prevent unnecessary re-renders, as we will see in the next chapters.
+Subscribing to a signal will cause the component using `useSignal` to re-render, even if the update or subscription is done down the tree. However, you can bind the signal subscription to the children using satellites, to prevent unnecessary re-renders, as we will see in the next chapters.
 
-## useSatellite
+## Satellites
+When it comes to updating the UI, each signal is bound to the component that created it using `useSignal`. If a child component, to whom the signal is passed down as a prop, calls `.sub()`, it triggers a re-render cascade from the parent to the child (and the whole component tree).
+
+However, this approach undermines SFR's goal of minimizing re-renders. It essentially leads to the same number of re-renders that would occur if we were using `useState` to lift the state up, without any significant added value.
+
+Enter satellites. A satellite is a signal that has a two-way subscription to another signal: when the parent signal updates, the satellite updates as well, and when the satellites updates, so does the parent signal. Moreover, a satellite can be bound to a different component than its parent. This allows the child to subscribe to the satellite without triggering the re-renders of an unsubscribed parent and the related component tree.
+
+Howevern, conceptully, we don't have to see the relation between a signal and the satellites as a hierarchical pyramidal structure, but rather like a chainmail. Each satellite, including the original signal, is synchronously influenced by the changes in any other satellite in the chain. Therefore, we must consider this entire chain as a unified signal when updating its value. The distinction between satellite layers is meaningful primarily for UI updates and component re-renders.
+
+Finally, as we will see shortly, multiple satellites together form an orbit.
+
+
+### useSatellite
 A common consequence of lifting the state up in React is that updating the state down the component tree will trigger a re-render of the higher-level parent component that holds the state, even if some of the intermediate components do not directly use or rely on that state.
 
 The same applies to `useSignal`. Due to the way React is build, in fact, SFR signals don't automatically bind to specific components, or pieces of UI (opposite to what SolidJS for instance would do).
