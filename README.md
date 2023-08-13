@@ -71,25 +71,18 @@ When it comes to updating the UI, each signal is bound to the component that cre
 
 However, this approach undermines SFR's goal of minimizing re-renders. It essentially leads to the same number of re-renders that would occur if we were using `useState` to lift the state up, without any significant added value.
 
-Enter satellites. A satellite is a signal that has a two-way subscription to another signal: when the parent signal updates, the satellite updates as well, and when the satellites updates, so does the parent signal. Moreover, a satellite can be bound to a different component than its parent. This allows the child to subscribe to the satellite without triggering the re-renders of an unsubscribed parent and the related component tree.
+Enter **satellites**. A **satellite** is a signal that has a two-way subscription to another signal: when the parent signal updates, the satellite updates as well, and when the satellites updates, so does the parent signal. Moreover, a satellite can be bound to a different component than its parent. This allows children components to subscribe to signals passed as props without triggering the re-renders of an unsubscribed parent and the related component tree.
 
-Howevern, conceptully, we don't have to see the relation between a signal and the satellites as a hierarchical pyramidal structure, but rather like a chainmail. Each satellite, including the original signal, is synchronously influenced by the changes in any other satellite in the chain. Therefore, we must consider this entire chain as a unified signal when updating its value. The distinction between satellite layers is meaningful primarily for UI updates and component re-renders.
+Howeven, conceptully, we don't have to see the relation between a signal and the satellites as a hierarchical pyramidal structure, but rather like a chainmail. Each satellite, including the original signal, is synchronously influenced by the changes in any other satellite in the chain. Therefore, we must consider this entire chain as an only signal when updating its value. The distinction between satellite layers is meaningful primarily for UI updates and component re-renders.
 
-Finally, as we will see shortly, multiple satellites together form an orbit.
+Finally, as we will see shortly, multiple satellites together form an **orbit**.
 
 
 ### useSatellite
-A common consequence of lifting the state up in React is that updating the state down the component tree will trigger a re-render of the higher-level parent component that holds the state, even if some of the intermediate components do not directly use or rely on that state.
-
-The same applies to `useSignal`. Due to the way React is build, in fact, SFR signals don't automatically bind to specific components, or pieces of UI (opposite to what SolidJS for instance would do).
-
-Let's consider an example where we are building a counter app. The count signal is managed by our `<Counter />` component, which does not directly subscribe to it. Similarly, the `<Increase />` and `<Decrease />`, children components, buttons only need to access the `.value` getter without subscribing to it. However, if the `<Display />`component calls `.sub()` to update the UI, the entire component tree will unnecessarily re-render.
-
-To avoid this, you can bind the signal to the component subscribing to it, by using `useSatellite`. This hook takes a signal as an argument, and returns a brand new one, storing the same value. Whenever one of the two signals updates, the other one will too (synchronously). However, the re-rendering will only propagate downwards, and the parents or same level components bound to the signal won't re-render unlsess subscribed. 
-
+The easiest way to create a satelite is by using the `useSatellite` hook. This hook simply takes a signal (original or satellite) as only parameter, and returns a satellite signal. 
 ```tsx
-const Display: React.FC<{ countSatellite: Signal<number>}> = ({ countSatellite }) =>  {
-  const count = useSatellite(countSatellite)
+const Display: React.FC<{ countSignal: Signal<number>}> = ({ countSatellite }) =>  {
+  const count = useSatellite(countSignal)
 
   return <p>{`The count is ${count.sub()}`}</p>
 }
@@ -98,14 +91,93 @@ function Counter() {
   const count = useSignal(0)
 
   return (<main>
-    <Display countSatellite={count} />
-    <Increase onIncrease={() => count.value += 1} />
-    <Decrease onDecrease={() => count.value -= 1} />
+    <Display countSignal={count} />
+    <Increase onIncrease={() => count.value += 1} /> // calling this will cause only <Display> to re-render
+    <Decrease onDecrease={() => count.value -= 1} /> // same here
   </main>)
 }
 ```
+We can pass either an original signal or a satellite to `useSatellite`. 
+When using `useSatellite` on the same signal in multiple layers of the component tree, we can pass either the original signal or the satellite down as prop. As mentioned before, the updates travel synchronously through the chain.
+```tsx
+const Parent: React.FC<{ countSignal: Signal<number>}> = ({ countSatellite }) =>  {
+  const count = useSatellite(countSignal)
 
-### React.memo and useSatellite
+  // more code here
+  return(<>
+    <Child countSignal={count}> // this work
+    <Child countSignal={countSignal}> // this is the same
+  </>)
+}
+```
+#### Caveat 1 : nullable signals
+When we need to work with nullable values, we should make sure that the the prop passing the signal is not `null` or `undefined`; in fact, `useSatellite` bounds the signal the first time the hook is called; it doesn't keep track of it remaining or not in the props; threfore, when we need to deal with nullable values, the `signal.value` should be nullabble, not the signal itself.
+```tsx
+  // this is not good
+  interface Props {
+    signal?: Signal<string>
+  }
+
+  // this is what we want to use
+  interface Props {
+    signal: <null | string>
+  }
+```
+
+#### Caveat 2 : React.memo and useSatellite
+When we pass a signal to a component that is memoized with React.memo, and we want that component to re-render when its parent component re-renders, we need to bind the signal with the useSatellite hook.
+
+The signal itself is a stable reference, which doesn't change between rerenders. Even if the memoized component calls signal.sub() to subscribe to updates from the signal, it won't trigger a re-render. However, if you pass directly the value of the signal, by calling signal.sub() in the prop, you'll be passing a different value each time the signal updatesn and this will cause the memoized component to rerender.
+This exemple explains it better:
+```tsx
+const count = useSignal(0)
+
+<MemoizedComponent count={count}> // it won't rerender when signal updates, unless it uses useSatellite
+<MemoizedComponenet count={count.sub()}> // it will rerender even if memoized
+```
+### useOrbit
+An `orbit` is an object which includes one or more signals, bound to the current component; `useOrbit` is a hook that takes an object (mainly the component's props) and return them, with any signal in it replaced with a satellite bound to the current component. 
+
+This hook is usefull when we have a lot of signals passed down, and we want to bound them all to the component wihout overcrowding it with `useSatellite`s and having to deal with naming conventions.
+
+```tsx 
+interface ChildProps {
+  count: Signal<number>,
+  name: Signal<string>,
+  notASignal: string,
+}
+function Child(props: ChildProps) {
+  const {
+    count, 
+    name,
+    notASignal
+  } = useOrbit(props)
+
+  return <>
+    <p>{count.value}</p>
+    <p>{name.value}</p>
+    <p>{notASignal}</p>
+
+  <>
+} 
+```
+#### Caveat 1 : nullable signals
+Like with `useSatellite`, when we need to work with nullable values, we should make sure that the the prop passing the signal is not `null` or `undefined`; in fact, `useOrbit` bounds the signal the first time the hook is called; it doesn't keep track of it remaining or not in the props; threfore, when we need to deal with nullable values, the `signal.value` should be nullable, not the signal itself. However, the other non-signal values are not tracked, therefore can be nullable;
+```tsx
+  // this is not good
+  interface Props {
+    count?: Signal<number>
+    name?: Signal<string>
+    nonSignalProp?: string
+  }
+
+  // this is what we want to use
+  interface Props {
+    count: Signal<null | number>
+    name: Signal<null | string>
+    nonSignalProp?: string // this can be nullable, as it is not a signal
+  }
+```
 
 # DTS React User Guide
 

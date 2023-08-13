@@ -12,13 +12,11 @@ import { useOrbit } from './useOrbit';
  */
 export function orbit<P extends {}>(Component: React.ComponentType<P>) {
   return (props: P) => {
-    const rerender = useRerender();
-    const satellites = useOrbit(props)
+    const boundProps = useOrbit(props)
 
     return (
       <Component
-        {...props}
-        {...satellites}
+        {...boundProps}
       />
     );
   };

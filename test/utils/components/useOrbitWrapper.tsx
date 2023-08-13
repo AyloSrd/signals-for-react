@@ -39,8 +39,8 @@ type InnerProps = {
   name: Signal<string>;
 } & SimpleUseOrbitProps;
 
-const Inner: FC<InnerProps> = ({ onRerender, ...props }) => {
-  const { count, name } = useOrbit(props);
+const Inner: FC<InnerProps> =  props => {
+  const { count, name, onRerender } = useOrbit(props);
   const [show, setShow] = useState(true);
 
   onRerender('inner');

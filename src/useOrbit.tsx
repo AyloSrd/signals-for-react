@@ -5,11 +5,11 @@ import { type ExtractSignalsFromObject } from './types';
 import { callFnIf, createSatellite } from './utils/utils';
 
 /**
- * Hook that generates a collection of satellites by identifying signals from the provided props object.
+ * Hook that bounds all signals in the props parameter to the current component.
  *
  * @template P - The type of the props object
  * @param {P} props - The props object containing the signals
- * @return {ExtractSignalsFromObject<P>} - The collection of satellites generated from the signals
+ * @return {P} - The collection of satellites generated from the signals
  */
 
 export function useOrbit<P extends {}>(props: P) {
@@ -51,5 +51,7 @@ export function useOrbit<P extends {}>(props: P) {
     };
   }, []);
 
-  return satellites;
+  const boundProps: P = { ...props, ...satellites }
+
+  return boundProps;
 }
