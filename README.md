@@ -125,9 +125,9 @@ When we need to work with nullable values, we should make sure that the the prop
 ```
 
 #### Caveat 2 : React.memo and useSatellite
-When we pass a signal to a component that is memoized with React.memo, and we want that component to re-render when its parent component re-renders, we need to bind the signal with the useSatellite hook.
+When we pass a signal to a component that is memoized with `React.memo`, and we want that component to re-render when its parent component re-renders, we need to bind the signal with the `useSatellite` hook.
 
-The signal itself is a stable reference, which doesn't change between rerenders. Even if the memoized component calls signal.sub() to subscribe to updates from the signal, it won't trigger a re-render. However, if you pass directly the value of the signal, by calling signal.sub() in the prop, you'll be passing a different value each time the signal updatesn and this will cause the memoized component to rerender.
+The signal itself is a stable reference, which doesn't change between rerenders. Even if the memoized component calls `signal.sub()` to subscribe to updates from the signal, it won't trigger a re-render. However, if you pass directly the value of the signal, by calling `signal.sub()` in the prop, you'll be passing a different value each time the signal updatesn and this will cause the memoized component to rerender.
 This exemple explains it better:
 ```tsx
 const count = useSignal(0)
@@ -136,9 +136,9 @@ const count = useSignal(0)
 <MemoizedComponenet count={count.sub()}> // it will rerender even if memoized
 ```
 ### useOrbit
-An `orbit` is an object which includes one or more signals, bound to the current component; `useOrbit` is a hook that takes an object (mainly the component's props) and return them, with any signal in it replaced with a satellite bound to the current component. 
+An `orbit` is an object which includes one or more signals, bound to the current component; `useOrbit` is a hook that takes an object (usually the component's props) and returns it,  with the signals replaced by their corresponding satellite signals bound to the current component. 
 
-This hook is usefull when we have a lot of signals passed down, and we want to bound them all to the component wihout overcrowding it with `useSatellite`s and having to deal with naming conventions.
+This hook is useful when we have multiple signals being passed down to a component and we want to bind them all to the component without cluttering it with multiple instances of the `useSatellite` and without having to deal with naming conventions.
 
 ```tsx 
 interface ChildProps {
@@ -154,8 +154,8 @@ function Child(props: ChildProps) {
   } = useOrbit(props)
 
   return <>
-    <p>{count.value}</p>
-    <p>{name.value}</p>
+    <p>{count.sub()}</p>
+    <p>{name.sub()}</p>
     <p>{notASignal}</p>
 
   <>
@@ -177,6 +177,77 @@ Like with `useSatellite`, when we need to work with nullable values, we should m
     name: Signal<null | string>
     nonSignalProp?: string // this can be nullable, as it is not a signal
   }
+```
+### orbit HOC
+An alternative to the `useOrbit` hook, is the `orbit` HOC, which, just like the hook, binds any signal in the props tho the current component.
+
+```tsx 
+interface ChildProps {
+  count: Signal<number>,
+  name: Signal<string>,
+  notASignal: string,
+}
+const Child: React.FC<ChildProps> = orbit(({
+  count, 
+  name,
+  notASignal
+}) => (<>
+    <p>{count.value}</p>
+    <p>{name.value}</p>
+    <p>{notASignal}</p>
+
+</>))
+```
+This HOC uses internally `useOrbit`, so it follows all the rules and caveats.
+## Monitoring Signals' Effects
+We may want subscribe to some signals' change to trigger some side effect, without causing the component to rerender. This could be either in th optics of calling some function, or to get a value derived from others.
+
+`SFR` comes with two hooks for that matters, which resemble to React's `useEffect` and `useMemo`.
+
+### useSignalEffect
+Just like React's `useEffect`, `useSignalEffect` takes a callback function and a dependencies' array consituted of only signals to observe; the callback will be executed whenever any of the signals updates; differently from the React hook, it passes the previous values to the callback (like `componentDidUpdate`); also, it doesn't take any clean up function;
+```tsx
+function Form() {
+  const age = useSignal<number>(0)
+  const name = useSignal<string>('')
+
+  useSignalEffect((prevAge, prevName) => {
+    if (prevAge !== age.value) API.doSomethig(age)
+    if (prevName !== name.value) API.doSomethigElse(name)
+
+    API.doAlso(agen number)
+  }, [age, name])
+
+  return (
+    <form>
+      {/* ...our code her */}
+    </form>
+  )
+}
+```
+When we need the current value of a signal we should by default call `signal.valie` in order to prevent any unnecessary re-rende; calling `signal.sub()` inside the hook will in fact subscribe and hence expose it to re-renders on value change.
+
+### useDerived
+`useDerived` is the signal's equivalent of `useMemo`.
+It takes a callback function and an array of signals dependencies as parameters; whenever any of the signals updates, it'll run the function and store its return value in a readonly signal;
+
+The readonly signals works exaclty as a normal signal or satellite, except you cannot assign any value to it; using `signal.value` as a setter will, in fact, throw error;
+
+```tsx
+function ValidatedForm() {
+  const age = useSignal<number>(0)
+  const name = useSignal<string>('')
+
+  const errors = useSignalEffect(() => validatorFn(age, name), [age, name])
+
+  errors.value = [] // this will throw error
+
+  return (
+    <form>
+      {/* ...our code her */}
+    </form>
+  )
+}
 ```
 
 # DTS React User Guide

@@ -1,6 +1,6 @@
 import { Signal, subscribeSymbol } from './Signal';
 import { useSignal } from './useSignal';
-import { createDerivedSignalProxy, extractSignalValues } from './utils/utils';
+import { createDerivedSignalProxy, callFnIf } from './utils/utils';
 import * as React from 'react';
 
 /**
@@ -17,7 +17,20 @@ export function useDerived<D, T extends Signal<any>[] | []>(
   deps: T
 ) {
   const signal = useSignal(cb());
-  const derivedSignal = React.useRef(createDerivedSignalProxy(signal)).current;
+  const isFirstHookCall = React.useRef(true)
+  const derivedSignal = React.useRef(
+    callFnIf(() => {
+      const readonlySignal = createDerivedSignalProxy(signal)
+
+
+      if (isFirstHookCall.current) isFirstHookCall.current = false
+      
+      return readonlySignal
+
+    },
+    () => isFirstHookCall.current
+    ),
+  ).current!;
   const unsubscribes = React.useRef<(() => void)[]>([]);
 
   React.useEffect(() => {
