@@ -1,6 +1,7 @@
 # 📡 Signals for React (SFR)
 
-Signals for React (SFR) is a library that aims to provide signal primitives for React applications without relying on React internals. SFR signals combine the functionalities of both refs and state. 
+
+Signals for React (SFR) is yet another library aiming to provide signal primitives for React applications without relying on React internals. SFR signals combine the functionalities of both refs and state. 
 
 Signals scope is to limit unnecessary re-rendering as much as possible, while keeping updated values accessible all over your React app.
 
@@ -29,7 +30,7 @@ The main concept to retain when it comes to SFR signals, is that they have to be
 
 The `.value` property is a getter and setter at the same time. It allows to retireve an up to date value, and to re-assign it. Accessing the getter doesn't subscribe the component to the signal, so won't trigger any re-render.
 
-In order to subscribe to it, you need to call the .`sub()` method. This will result in the component bound to said signal to re-render
+In order to subscribe to it, you need to call the .`sub()` method. This will result in the component bound to said signal to re-render.
 
 
 ### useSignal
@@ -238,17 +239,20 @@ function ValidatedForm() {
   const age = useSignal<number>(0)
   const name = useSignal<string>('')
 
-  const errors = useSignalEffect(() => validatorFn(age, name), [age, name])
+  const errors = useDerived(() => validatorFn(age, name), [age, name])
 
   errors.value = [] // this will throw error
 
   return (
     <form>
-      {/* ...our code her */}
+      {/* ...our code here */}
     </form>
   )
 }
 ```
+## Signals for App-level state management
+While signals can be used as a replacement of `useState` to handle state at component level, they can also serve as a powerful tool for state management across your React application. With the introduction of the `createSignal` function, you can create standalone signals that can be managed independently of components, allowing for a more flexible approach to state management and shared across the component tree avoiding prop-drilling.
+
 
 # DTS React User Guide
 
