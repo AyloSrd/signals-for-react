@@ -1,11 +1,8 @@
 # 📡 Signals for React (SFR)
 
+Signals for React (SFR) is yet another library aiming to provide signal primitives for React applications.
 
-Signals for React (SFR) is yet another library aiming to provide signal primitives for React applications without relying on React internals. SFR signals combine the functionalities of both refs and state. 
-
-Signals scope is to limit unnecessary re-rendering as much as possible, while keeping updated values accessible all over your React app.
-
-They store a value that can be accessed and modified by accessing the `value` property of the signal. Additionally, signal can trigger a re-render if the component is subscribed to updates through the `sub` method of the signal.
+The scope of signals is to limit unnecessary re-rendering as much as possible while keeping updated values accessible throughout your React app. This is achieved without relying on React internals.
 
 Each signal can be bound to the component (and children) by creating satellites of said signal; finally, signals come with several utilities, such useSignalEffect or useDerived (respectively the signal version of useEffect and useMemo).
 
@@ -61,7 +58,7 @@ In order to make the signal reactive, the component needs to call the `.sub()` m
 <p>{`The count is ${count.sub()}`}</p>
 ```
 
-To update the value of a signal, you can simply reassign the value using the `.value` property. This will update the value of the signal and trigger UI updates if the `.sub()` method is called on the same signal somewhere in the component or down the tree. It will also trigger updates for any other signals that depend on it, including satellites and derived readonly signals.
+To update the value of a signal, you can simply reassign the value using the `.value` property. This will update the value of the signal and trigger UI updates if the `.sub()` method is called on the same signal somewhere in the component or down the tree. It will also trigger updates for any other signals that depend on it, including satellites and derived readonly signals (we'll see what they are in the paragraphs below).
 ```tsx
 <button onClick={() => count.value *= 2}>Double</button>
 ```
@@ -74,13 +71,11 @@ However, this approach undermines SFR's goal of minimizing re-renders. It essent
 
 Enter **satellites**. A **satellite** is a signal that has a two-way subscription to another signal: when the parent signal updates, the satellite updates as well, and when the satellites updates, so does the parent signal. Moreover, a satellite can be bound to a different component than its parent. This allows children components to subscribe to signals passed as props without triggering the re-renders of an unsubscribed parent and the related component tree.
 
-Howeven, conceptully, we don't have to see the relation between a signal and the satellites as a hierarchical pyramidal structure, but rather like a chainmail. Each satellite, including the original signal, is synchronously influenced by the changes in any other satellite in the chain. Therefore, we must consider this entire chain as an only signal when updating its value. The distinction between satellite layers is meaningful primarily for UI updates and component re-renders.
+However, conceptully, we don't have to see the relation between a signal and the satellites as a hierarchical pyramidal structure, but rather like a chainmail. Each satellite, including the original signal, is synchronously influenced by the changes in any other satellite in the chain. Therefore, we must consider this entire chain as an only signal when updating its value. The distinction between satellite layers is meaningful primarily for UI updates and component re-renders.
 
 Finally, as we will see shortly, multiple satellites together form an **orbit**.
-
-
 ### useSatellite
-The easiest way to create a satelite is by using the `useSatellite` hook. This hook simply takes a signal (original or satellite) as only parameter, and returns a satellite signal. 
+The easiest way to create a satelite is by using the `useSatellite` hook. This hook simply takes a signal (original or satellite, or, as we'll see later, a standalone one) as only parameter, and returns a satellite signal. 
 ```tsx
 const Display: React.FC<{ countSignal: Signal<number>}> = ({ countSatellite }) =>  {
   const count = useSatellite(countSignal)
@@ -106,7 +101,7 @@ const Parent: React.FC<{ countSignal: Signal<number>}> = ({ countSatellite }) =>
 
   // more code here
   return(<>
-    <Child countSignal={count}> // this work
+    <Child countSignal={count}> // this works
     <Child countSignal={countSignal}> // this is the same
   </>)
 }
@@ -128,13 +123,13 @@ When we need to work with nullable values, we should make sure that the the prop
 #### Caveat 2 : React.memo and useSatellite
 When we pass a signal to a component that is memoized with `React.memo`, and we want that component to re-render when its parent component re-renders, we need to bind the signal with the `useSatellite` hook.
 
-The signal itself is a stable reference, which doesn't change between rerenders. Even if the memoized component calls `signal.sub()` to subscribe to updates from the signal, it won't trigger a re-render. However, if you pass directly the value of the signal, by calling `signal.sub()` in the prop, you'll be passing a different value each time the signal updatesn and this will cause the memoized component to rerender.
+The signal itself is a stable reference, which doesn't change between re-renders. Even if the memoized component calls `signal.sub()` to subscribe to updates from the signal, it won't trigger a re-render. However, if you pass directly the value of the signal, by calling `signal.sub()` in the prop, you'll be passing a different value each time the signal updatesn and this will cause the memoized component to re-render.
 This exemple explains it better:
 ```tsx
 const count = useSignal(0)
 
-<MemoizedComponent count={count}> // it won't rerender when signal updates, unless it uses useSatellite
-<MemoizedComponenet count={count.sub()}> // it will rerender even if memoized
+<MemoizedComponent count={count}> // it won't re-render when signal updates, unless it uses useSatellite
+<MemoizedComponenet count={count.sub()}> // it will re-render even if memoized
 ```
 ### useOrbit
 An `orbit` is an object which includes one or more signals, bound to the current component; `useOrbit` is a hook that takes an object (usually the component's props) and returns it,  with the signals replaced by their corresponding satellite signals bound to the current component. 
@@ -201,9 +196,9 @@ const Child: React.FC<ChildProps> = orbit(({
 ```
 This HOC uses internally `useOrbit`, so it follows all the rules and caveats.
 ## Monitoring Signals' Effects
-We may want subscribe to some signals' change to trigger some side effect, without causing the component to rerender. This could be either in th optics of calling some function, or to get a value derived from others.
+SFR provides two hooks that serve similar purposes to React's `useEffect` and `useMemo`.
 
-`SFR` comes with two hooks for that matters, which resemble to React's `useEffect` and `useMemo`.
+These hooks allow you to manage side effects and memoize derived values within the Signals framework, similar to how you would use React's `useEffect` and `useMemo`hooks in a React application.
 
 ### useSignalEffect
 Just like React's `useEffect`, `useSignalEffect` takes a callback function and a dependencies' array consituted of only signals to observe; the callback will be executed whenever any of the signals updates; differently from the React hook, it passes the previous values to the callback (like `componentDidUpdate`); also, it doesn't take any clean up function;
@@ -226,13 +221,14 @@ function Form() {
   )
 }
 ```
-When we need the current value of a signal we should by default call `signal.valie` in order to prevent any unnecessary re-rende; calling `signal.sub()` inside the hook will in fact subscribe and hence expose it to re-renders on value change.
+When we need to access the current value of a signal inside a hook, it is generally recommended to call `signal.value` by default. This approach helps prevent any unnecessary re-renders of your component.
 
+In fact, if you call `signal.sub()` inside the hook, it will subscribe to the signal, which means that your component will be re-rendered whenever the value of the signal changes.
 ### useDerived
 `useDerived` is the signal's equivalent of `useMemo`.
 It takes a callback function and an array of signals dependencies as parameters; whenever any of the signals updates, it'll run the function and store its return value in a readonly signal;
 
-The readonly signals works exaclty as a normal signal or satellite, except you cannot assign any value to it; using `signal.value` as a setter will, in fact, throw error;
+The readonly signals works exaclty as a normal signal or satellite, except we cannot assign any value to it; using `signal.value` as a setter will, in fact, throw an error;
 
 ```tsx
 function ValidatedForm() {
@@ -253,6 +249,96 @@ function ValidatedForm() {
 ## Signals for App-level state management
 While signals can be used as a replacement of `useState` to handle state at component level, they can also serve as a powerful tool for state management across your React application. With the introduction of the `createSignal` function, you can create standalone signals that can be managed independently of components, allowing for a more flexible approach to state management and shared across the component tree avoiding prop-drilling.
 
+### createSignal
+The `createSignal` lets us generate standalone signals that are not inherently bound to any specific component. This means we can use them for managing application-wide state or any scenario where you require dynamic values that do not strictly belong to a single component. By employing these independent signals, you not only gain a powerful tool for managing state within your application, but you also sidestep the need for prop drilling, ensuring that your state remains easily accessible without passing it down through multiple layers of components. 
+You can also update the signal outside the component tree, and this will be propagated to any component bound to the signal.
+The syntax for creating and updating a standalone signal is as follows:
+```tsx
+import { createSignal } from 'signals-for-react';
+
+const isAuthenticated = createSignal(false);
+
+async function login () {
+  await authenticationFn()
+  isAuthenticated.value = true
+}
+
+const LoginButton: FC = () => <button onClick={login}>Login</button>
+```
+### Binding independent signals to components
+To integrate these independent signals into your components, we have several ways; the easiest is to use the `useSatellite` hook. This approach allows us to connect a satellite signal to a specific component, ensuring that updates to the signal are localized to the components that need them.
+
+```tsx
+function Header(): FC {
+  const isAuthenticated = useSatellite(isAuthenticated);
+
+  return <header>{isAuthenticated.sub() ? 'Welcome, User!' : 'Please Log In'}</header>;
+}
+```
+Or we could derive a readonly signal, by using `useDerived`:
+```tsx
+const UserDetails = (): FC => {
+  const userRole = useDerived(() => {
+    if (isAuthenticatedSignal.value) return 'member';
+    return 'guest';
+  }, [isAuthenticatedSignal]);
+
+  return <p>User role: {userRole.sub()}</p>;
+}
+```
+Furthermore, we could group multiple independent signals in unique app state object, and bind it to a component with `useOrbit`:
+```tsx
+const name = createSignal('');
+const email = createSignal('');
+const age = createSignal(0);
+
+// Group signals into an app-state object
+const user = {
+  name,
+  email,
+  age,
+};
+
+const UserProfile: FC = () => {
+    const { name, email, age } = useOrbit(user);
+
+    function handleNameChange(e:  ChangeEvent<HTMLInputElement>) {
+      name.value = e.target.value
+    }
+    // display those info below ...
+}
+```
+Finally, to respond to changes in these independent signals, we can utilize the `useSignalEffect`:
+```tsx
+const App: FC = () => {
+  useSignalEffect(() => {
+    // This effect runs whenever isAuthenticatedSignal changes
+    if (isAuthenticatedSignal.value) {
+      // Perform actions for authenticated users
+    } else {
+      // Handle logout or unauthorized actions
+    }
+  }, [isAuthenticatedSignal]);
+
+  // ...
+}
+```
+### Caveat: orbit HOC
+While you can use `useOrbit`, as you can control the object pased as parameter, calling an independent signal in a component wrapped in `orbit` won't bind the former to the latter, as we cannot pass it in the props.
+
+## Conclusion: Unleash the Power of Signals for Seamless React State Management
+
+Congratulations! You've embarked on an exciting journey with Signals for React (SFR). Beyond just state management, SFR empowers you to optimize, modularize, and create lightning-fast interfaces.
+
+With SFR, you've learned to:
+
+- **Minimize Re-renders:** Signals focus updates precisely, preventing unnecessary re-renders and boosting performance.
+
+- **Elevate State Management:** Escape prop drilling and manage state across components using signals and app-state objects.
+
+- **Craft Responsive UIs:** Control rendering with satellites and readonly signals for ultra-responsive interfaces.
+
+Happy coding, and may your signals resonate strongly! 🚀🔊
 
 # DTS React User Guide
 

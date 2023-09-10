@@ -1,9 +1,9 @@
 import * as React from 'react';
 
 export function useRerender() {
-  const [, setState] = React.useState(0);
+  const [, setState] = React.useState({});
 
   return React.useCallback(() => {
-    setState((s) => s + 1);
+    setState({});
   }, []);
 }
