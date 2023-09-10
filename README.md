@@ -1,6 +1,6 @@
 # 📡 Signals for React (SFR)
 
-Signals for React (SFR) is yet another library aiming to provide signal primitives for React applications.
+Signals for React (SFR) is a library aiming to provide signal primitives for React applications.
 
 The scope of signals is to limit unnecessary re-rendering as much as possible while keeping updated values accessible throughout your React app. This is achieved without relying on React internals.
 
