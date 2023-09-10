@@ -64,6 +64,8 @@ To update the value of a signal, we can simply reassign the value using the `.va
 ```
 Subscribing to a signal will cause the component using `useSignal` to re-render, even if the update or subscription is done down the tree. However, we can bind the signal subscription to the children using satellites, to prevent unnecessary re-renders, as we will see in the next chapters.
 
+[try in react playground](https://reactplayground.vercel.app/#N4IglgdgJgpgHgOgFYGcQC5wFsAOB7AJwBcACAQRxxIDMC8sSByBAegp2RTkYB0IxchUgCUYAQwDGpWvSYFxU3v0HESwEhPliiMYXjykAvjToNGWqQFoo9FhIA2YGBCJK+EvBBSkPLsZBgCEgBeEhsJAFcsZyIEAHMYIgBRexholwAhAE8ASSgACnN9VwBKd09vEjoDEI0tHT0DfN8ifwhAsohq2PloQPy+EhJRSVjNcR0UtJiBiCGhkakEAGUiAjApAFk8WAAaQfmICPt7fbn5xbH6mCn0onz2TqHOkpBdkHZOOAxsfFVL3ZqEgRFAwVbaGAkYwyMwWVx8AR-UjeLKpKAmWSMFFoyweQTtFwoJSIoRAkFgsBxCBiexQjFmFCU6n2FCWaiESxwtwQXyVdi1fIlEIAPjUB15PjwERctXJyyZNPyAAZOgd5EQIgQ5rN5iQADwZCJEIieEieADCjgkAGtgsBBSKNFKXAgAG40iKQgDUoQAjIZhQddXqUDgxHM6KlgjxsHEYyQxOsxJZ7GIAEYwezRkBwyxpPBIMAx4WAbLJAPB-epYofDouAHmlsRQETTgsMQf1LENxs8gfOnTbEHKXlIXZNc1C2JgUAQaaNY4ABgd2S5LIyAF4wdAkABM8iwAG4+IvB+04EiwjBqGJjqR2CBDEA)
+
 ## Satellites
 When it comes to updating the UI, each signal is bound to the component that created it using `useSignal`. If a child component, to whom the signal is passed down as a prop, calls `.sub()`, it triggers a re-render cascade from the parent to the child (and the whole component tree).
 
@@ -93,6 +95,8 @@ function Counter() {
   </main>)
 }
 ```
+[try in react playground](https://reactplayground.vercel.app/#N4IglgdgJgpgHgOgFYGcQC5wFsAOB7AJwBcACAQRxxIDMC8sSByBAegp2RTkYB0IxchUgCUYAQwDGpWvSYFxU3v0HESwEhPliiMYXjykAvjToNGWqQFoo9FhIA2YGBCJK+EvBBSkPLsZBgCEgBeEhsJAFcsZyIEAHMYIgBRexholwAhAE8ASSgACnN9VwBKd09vEjoDEI0tHT0DfN8ifwhAsohq2PloQPy+EhJRSVjNcR0UtJiBiCGhkakEAGUiAjApAFk8WAAaQfmICPt7fbn5xbH6mCn0onz2TqHOkpBdkHZOOAxsfFVL3ZqEgRFAwVbaGAkYwyMwWVx8AR-UjqEFgsBxCBiexQkyyRgodGY+woSzUQiWOFKRFCIEZCJEIieHEwpisOkMzxUlTIkgAETAKBw9jEWWZplZLH5guFWTcEHKXlI7Fq+RKIQAfGoDr5Kh4Ii5aqjloSsfkAAxPDQVPCpBD2PBxQryCnOWDrCBxciURidA7yIgRAhzfIAHnVByGIalQpFVv1RGCwD1LmMLHD50j7MZc08AGFHBIANaJ1UauMuBAANyxEUhAGpQgBGQzp+bzHIQcZiUERkghlhZzyt+Yhwc5iD5jbF4Cl4Ka5Oxav2WskSxNlu9oa8mBdnsZvsD+nZ4eZo9MvMF6ez+fW232x0Lqs1mAlDf7oYANWfvf7Y+H-fVTpDD4Ph4CRMIYGoMRjiVSg3hAMcvh+al-gUaRxXMNC5TAmlqH1KQwCZMd8nUCQAAswHsKBekBC8p0MNVgG1W8YDtB0nRgF0+ndT0xx9P1EkDOYQwAIzPcdJyLRM6KLFskwoqjekMfsxI5CB00MeDoxlJDMBQkQ0NxWEsIRbkgSNCETjAHQxTxAkMSxEkyQIF1RmwuBwLwzsiEIuZtJFfIcDoHAUEY5jFXLUhQgsnQrJ0QLgpQBAF0tHUbVY+8OK4t1IE9fzZUtf0hL7MiACZ1STPB4wQFAIhE1VlJYMqNJAQwgA)
+
 We can pass either an original signal or a satellite to `useSatellite`. 
 When using `useSatellite` on the same signal in multiple layers of the component tree, we can pass either the original signal or the satellite down as prop. As mentioned before, the updates travel synchronously through the chain.
 ```tsx
@@ -153,10 +157,10 @@ function Child(props: ChildProps) {
     <p>{count.sub()}</p>
     <p>{name.sub()}</p>
     <p>{notASignal}</p>
-
   <>
 } 
 ```
+[try in react playground](https://reactplayground.vercel.app/#N4IglgdgJgpgHgOgFYGcQC5wFsAOB7AJwBcACAQRxxIDMC8sSByBAegp2RTkYB0IxchUgCUYAQwDGpWvSYFxU3v0HESwEhPliiMYXjykAvjToNGWqQFoo9FhIA2YGBCJK+EvBBSkPLsZBgCEgBeEhsJAFcsZyIEAHMYIgBRexholwAhAE8ASSgACnN9VwBKd09vEjoDEI0tHT0DfN8ifwhAsohq2PloQPy+EhJRSVjNcR0UtJiBiCGhkakEAGUiAjApAFk8WAAaQfmICPt7fbn5xbH6mCn0onz2TqHOkpBdkHZOOAxsfFVL3ZqEgRFAwVbaGAkYwyMwWVx8AR-UjqEFgsBxCBiexQkyyRgodGY+woSzUQiWOFKRFCIEZCJEIieHEwpisOkMzxUlTIkgAETAKBw9jEWWZplZLH5guFWTcEHKXlI7Fq+RKIQAfGoDr5KmIErVUctCVj8gAGJ4aCqkTHRA2go0Yk2MRgWnV4VIIex4OKFeQU5ywdYQOLkSguvgHeRECIEOb5AA86oOQ3jUqFIpIepgwWAWeMNuzwALxiIYCIqWCPBAOS8gVIUG0YirLCT5xTACMgi3kyR41AwAA3Vvzebx4XtmD2Ycj+YAOTE0XQPZH8cgOHpJCIWRw2arOjgRCrJE8AGEABZiYOFyHBTUFhADrERG8kGAIVoEBKxR-2Z-GbttqOLDjpO04rp2JAATOvYQVBM5jmIE5Tsu8xkAkS6ASua4bluO6ViARxYBOBBHqeF5XjmN6almD5Pi+b4fl+tG-jA-5gUBIHIZhMFdux8YsP2Q4HPx6qdIYEbtHASJhDA1BiMcSqUG8IDsoyEBfD81L-Ao0jiuYOlyvA0nUBEEBSGATKqZ4+TqBIZ5gPYUC9ICp6OBIADWhhqsA2oVO6b5ej6+n+n0QYhlZEDhucUYxnM8btvSanHhAJ5ue5OauRsnnqsAdkOU5ziGPxCUchAraGMpaYyhpmBaSIOm4rCBkItyQKogA8gQ7ZlmKeIEo6xKkuSlISUZNImWZpZMlVIr5DgdA4Cg3m+YqQJZoCBaAqW5aQsYoQdV1ZZzQtS0rSg-met6vowCFgaQCGM2yhaMWxiQCaCXxZ4AEw5dtqRFSw318Z2cEpmeADM6rzouaj3igETtqqAMQ59kNoTA6BqDR8OIyUyOQ8JAmDqJfAVYYQA)
 #### Caveat 1 : nullable signals
 Like with `useSatellite`, when we need to work with nullable values, we should make sure that the the prop passing the signal is not `null` or `undefined`; in fact, `useOrbit` bounds the signal the first time the hook is called; it doesn't keep track of it remaining or not in the props; threfore, when we need to deal with nullable values, the `signal.value` should be nullable, not the signal itself. However, the other non-signal values are not tracked, therefore can be nullable;
 ```tsx
@@ -194,6 +198,8 @@ const Child: React.FC<ChildProps> = orbit(({
 
 </>))
 ```
+[try in react playground](https://reactplayground.vercel.app/#N4IglgdgJgpgHgOgFYGcQC5wFsAOB7AJwBcACAQRxxIDMC8sSByBAegp2RTkYB0IxchUgCUYAQwDGpWvSYFxU3v0HESwEhPliiMYXjykAvjToNGWqQFoo9FhIA2YGBCJK+EvBBSkPLsZBgCEgBeEhsJAFcsZyIEAHMYIgBRexholwAhAE8ASSgACnN9VwBKd09vEjoDEI0tHT0DfN8ifwhAsohq2PloQPy+EhJRSVjNcR0UtJiBiCGhkakEAGUiAjApAFk8WAAaQfmICPt7fbn5xbH6mCn0onz2TqHOkpBdkHZOOAxsfFVL3ZqEgRFAwVbaGAkYwyMwWVx8AR-UjqEFgsBxCBiexQkyyRgodGY+woSzUQiWOFKRFCIEZCJEIieHEwpisOkMzxUlTIkgAETAKBw9jEWWZplZLH5guFWTcEHKXlI7Fq+RKIQAfGoDr5KmIErVUctCVj8gAGJ4aCqkTHRA2go0Yk2MRgWnV4VIIex4OKFeQU5ywdYQOLkSguvgHeRECIEOb5AA86oOQ3jUqFIpIepgwWAWeMNuzwALxiIYCIqWCPBAOS8gVIUG0YirLCT5xTACMgi3kyR41AwAA3Vvzebx4XtmD2Ycj+YAOTE0XQPZH8cgOHpJCIWRw2arOjgRCrJE8AGEABZiYOFyHBTUFhADrERG8kGAIVoEBKxR-2Z-GbttqOLDjpO04rp2JAATOvYQVBM5jmIE5Tsu8xkAkS6ASua4bluO6ViARxYBOBBHqeF5XjmN6almD5Pi+b4fl+tG-jA-5gUBIHIZhMFdux8YsP2Q4HPx6qdIYEbtHASJhDA1BiMcSqUG8IDsoyEBfD81L-Ao0jiuYOlyvA0nUBEEBSGATKqZ4+TqBIZ5gPYUC9ICp6OBIADWhhqsA2oVO6b5ej6+n+n0QYhlZEDhucUYxnM8btvSanHhAJ5ue5OauRsnnqsAdkOU5ziGPxCUchAraGMpaYyhpmBaSIOm4rCBkItyQKEO2ZZiniBKOsSpLkpSElGTSOqkFVGahO1Zb5DZmYJICBaAqW5aQl5GpavK5xuh6gW+jAIWBpAIbjbKFoxbGJAJoJfFngATDly2pEVLB3XxnZwSmZ4AMzqvOi5qPeKARO2qrPd9N0-WhMDoGoNFAyDJRgz9wkCYOol8F5ICGEAA)
+
 This HOC uses internally `useOrbit`, so it follows all the rules and caveats.
 ## Monitoring Signals' Effects
 SFR provides two hooks that serve similar purposes to React's `useEffect` and `useMemo`.
